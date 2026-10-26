@@ -214,6 +214,67 @@ export type Database = {
           },
         ];
       };
+      event_stats: {
+        Row: {
+          event_id: string;
+          n: number;
+          rebuilt_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          event_id: string;
+          n: number;
+          rebuilt_at?: string;
+        };
+        Update: {
+          event_id?: string;
+          n?: number;
+          rebuilt_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "event_stats_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: true;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      event_tag_stats: {
+        Row: {
+          count: number;
+          event_id: string;
+          tag_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          count: number;
+          event_id: string;
+          tag_id: string;
+        };
+        Update: {
+          count?: number;
+          event_id?: string;
+          tag_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "event_tag_stats_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "event_tag_stats_tag_id_fkey";
+            columns: ["tag_id"];
+            isOneToOne: false;
+            referencedRelation: "interest_tags";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       events: {
         Row: {
           allow_custom_interests: boolean;
@@ -534,6 +595,36 @@ export type Database = {
           joined_at: string;
           joined_via: string;
           left_at: string;
+        }[];
+      };
+      get_event_tag_counts: {
+        Args: { p_event_id: string };
+        Returns: {
+          holders: number;
+          label: string;
+          mine: boolean;
+          tag_id: string;
+        }[];
+      };
+      get_matches: {
+        Args: {
+          p_event_id: string;
+          p_limit?: number;
+          p_mode?: string;
+          p_offset?: number;
+          p_tag?: string;
+        };
+        Returns: {
+          attendee_id: string;
+          avatar_path: string;
+          bio: string;
+          company: string;
+          completed_at: string;
+          full_name: string;
+          headline: string;
+          looking_for: string;
+          score: number;
+          shared_tags: string[];
         }[];
       };
       join_event: {

@@ -15,7 +15,8 @@
     "db:test": "supabase test db",
     "db:lint": "squawk supabase/migrations/*.sql",
     "db:types": "supabase gen types typescript --local --schema public > lib/supabase/types.ts && prettier --write lib/supabase/types.ts",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "seed:attendees": "node scripts/seed-attendees.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

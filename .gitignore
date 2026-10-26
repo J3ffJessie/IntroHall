@@ -44,3 +44,4 @@ supabase/.env
 /test-results/
 /playwright-report/
 .omc/
+/load/.matches-fixture.json

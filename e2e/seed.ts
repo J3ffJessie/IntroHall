@@ -28,3 +28,24 @@ export async function seedEvent(opts: { ownerId: string; tags: string[]; code?: 
   }
   return { slug, eventId: ev.id as string };
 }
+
+/** Adds a completed, visible attendee holding the given (official) tag labels. */
+export async function seedAttendee(eventId: string, opts: { name: string; headline?: string; tags: string[]; lookingFor?: string }) {
+  const { rows: [u] } = await pool.query(
+    `insert into auth.users (id, email, aud, role, raw_user_meta_data)
+     values (gen_random_uuid(), gen_random_uuid() || '@seed.test', 'authenticated', 'authenticated', $1) returning id`,
+    [JSON.stringify({ full_name: opts.name })]);
+  if (opts.headline) await pool.query("update public.accounts set headline = $2 where user_id = $1", [u.id, opts.headline]);
+  const { rows: [a] } = await pool.query(
+    `insert into public.attendees (event_id, user_id, joined_via, completed_at, looking_for)
+     values ($1, $2, 'link', now(), $3) returning id`, [eventId, u.id, opts.lookingFor ?? ""]);
+  await pool.query(
+    `insert into public.attendee_interests (attendee_id, tag_id, event_id)
+     select $1, t.id, $2 from public.interest_tags t where t.event_id = $2 and t.label = any($3::text[])`,
+    [a.id, eventId, opts.tags]);
+}
+
+/** Runs the stats rebuild now instead of waiting for the 30 s cron. */
+export async function rebuildStats() {
+  await pool.query("select private.rebuild_dirty_event_stats()");
+}

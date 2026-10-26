@@ -56,8 +56,11 @@ test("attendee joins, sets up a profile, and the organizer can ban them", async 
   await att.getByLabel("Short bio").fill("Secret bio text");
   await att.getByRole("button", { name: "Save and continue" }).click();
 
-  // Home shows the saved profile.
-  await expect(att.getByRole("heading", { name: "You're in, Ada!" })).toBeVisible();
+  // Saving lands on matches (empty so far); the profile page shows the saved interests.
+  await expect(att.getByRole("heading", { name: "People who share your interests" })).toBeVisible();
+  await expect(att.getByText("No one shares your interests yet.")).toBeVisible();
+  await att.getByRole("link", { name: "My profile" }).click();
+  await expect(att.getByRole("heading", { name: "My profile" })).toBeVisible();
   const chips = att.getByRole("list", { name: "Your interests" });
   for (const l of ["AI", "Espresso", "Machine Learning", "Rust"]) await expect(chips.getByText(l, { exact: true })).toBeVisible();
   await expectNoSeriousA11yViolations(att);
@@ -68,7 +71,7 @@ test("attendee joins, sets up a profile, and the organizer can ban them", async 
   await att.getByRole("button", { name: "Show my profile" }).click();
   await expect(att.getByText("Your profile is hidden.")).toHaveCount(0);
 
-  // Visiting /join again while joined goes straight home.
+  // Visiting /join again while joined goes straight to matches.
   await att.goto(`http://${slug}.${ROOT}/join`);
   await expect(att).toHaveURL(`http://${slug}.${ROOT}/home`);
 

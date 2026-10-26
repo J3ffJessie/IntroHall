@@ -40,6 +40,7 @@ service-worker/push work (Phase 5) to need HTTPS locally.
 | `pnpm db:test` | pgTAP: RLS, grants, RPC rejection paths (`supabase/tests`) |
 | `pnpm test:integration` | Concurrency checks against the local DB, e.g. the attendee cap under 150 parallel joins |
 | `k6 run -e ANON_KEY=… -e SLUG=… load/join.js` | Keynote-burst load test (500 sign-ups + joins/min); needs [k6](https://k6.io) |
+| `node load/seed-matches.mts && k6 run -e ANON_KEY=… load/matches.js` | Matching load test: 5,000 attendees × 20 interests, 50 req/s |
 | `pnpm test:e2e` | Playwright + axe (needs `pnpm db:start`) |
 | `pnpm db:types` | Regenerate `lib/supabase/types.ts` after a migration |
 

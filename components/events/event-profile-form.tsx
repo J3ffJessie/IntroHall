@@ -6,6 +6,7 @@ import { MAX_INTERESTS } from "@/lib/event-profile";
 import type { FormState } from "@/lib/form-state";
 import { tagKey } from "@/lib/tags";
 import { useFormAction } from "@/lib/use-form-action";
+import { useHydrated } from "@/lib/use-hydrated";
 
 type Tag = { id: string; label: string; selected: boolean };
 type Props = {
@@ -19,6 +20,7 @@ type Props = {
 
 export function EventProfileForm({ action, initial, tags, allowCustom, maxCustom, submitLabel }: Props) {
   const [state, onSubmit, pending] = useFormAction(action);
+  const hydrated = useHydrated();
   const [selected, setSelected] = useState(() => new Set(tags.filter((t) => t.selected).map((t) => t.id)));
   const [custom, setCustom] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
@@ -116,7 +118,7 @@ export function EventProfileForm({ action, initial, tags, allowCustom, maxCustom
         </Field>
       </Card>
 
-      <Button type="submit" disabled={pending || total === 0} className="w-full">{pending ? "Saving…" : submitLabel}</Button>
+      <Button type="submit" disabled={pending || total === 0 || !hydrated} className="w-full">{pending ? "Saving…" : submitLabel}</Button>
       <FormMessage state={state} />
     </form>
   );

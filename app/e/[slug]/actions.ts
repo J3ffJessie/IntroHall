@@ -35,7 +35,7 @@ export async function saveEventProfile(slug: string, _prev: FormState, form: For
 export async function setProfileVisibility(slug: string, visibility: "visible" | "hidden"): Promise<void> {
   const { supabase, active } = await requireActive(slug);
   await supabase.from("attendees").update({ visibility }).eq("id", active.id);
-  redirect("/home");
+  redirect("/me");
 }
 
 export async function leaveEvent(slug: string): Promise<void> {
