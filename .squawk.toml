@@ -1,0 +1,4 @@
+# Supabase CLI applies each migration inside a transaction.
+assume_in_transaction = true
+# Integer columns here are small bounded settings (limits, positions), never IDs.
+excluded_rules = ["prefer-bigint-over-int"]

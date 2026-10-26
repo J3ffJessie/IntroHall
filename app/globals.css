@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Zinc neutrals + indigo accent; light and dark follow the OS setting.
+ * Every text/background pair below meets WCAG AA (≥ 4.5:1) in both modes.
+ * Use the semantic utilities (bg-surface, text-muted, border-border, bg-primary …), never raw palette colors.
+ */
+:root {
+  color-scheme: light dark;
+
+  --canvas: #f7f7f8;
+  --surface: #ffffff;
+  --surface-muted: #f4f4f5;
+  --fg: #18181b;
+  --muted: #52525b;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-fg: #ffffff;
+  --primary-soft: #eef2ff;
+  --primary-soft-fg: #3730a3;
+
+  --danger: #b91c1c;
+  --danger-soft: #fef2f2;
+  --success: #15803d;
+  --success-soft: #f0fdf4;
+  --warning-fg: #92400e;
+  --warning-soft: #fffbeb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: #09090b;
+    --surface: #18181b;
+    --surface-muted: #27272a;
+    --fg: #fafafa;
+    --muted: #a1a1aa;
+    --border: #27272a;
+    --border-strong: #3f3f46;
+
+    --primary: #818cf8;
+    --primary-hover: #a5b4fc;
+    --primary-fg: #0f0d2e;
+    --primary-soft: #1e1b4b;
+    --primary-soft-fg: #c7d2fe;
+
+    --danger: #f87171;
+    --danger-soft: #2c1215;
+    --success: #4ade80;
+    --success-soft: #0c2716;
+    --warning-fg: #fcd34d;
+    --warning-soft: #2a1f0a;
+  }
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-fg: var(--primary-soft-fg);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning-fg: var(--warning-fg);
+  --color-warning-soft: var(--warning-soft);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--fg);
+  font-family: var(--font-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}

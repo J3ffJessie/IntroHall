@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm db:lint
+
+  database-and-e2e:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_ROOT_DOMAIN: localtest.me:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID: ci-unused
+      SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET: ci-unused
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Start Supabase
+        run: pnpm exec supabase start -x studio,imgproxy,vector,logflare,edge-runtime
+      - name: pgTAP
+        run: pnpm db:test
+      - name: Concurrency integration tests
+        run: pnpm test:integration
+      - name: Generated types are up to date
+        run: pnpm db:types && git diff --exit-code lib/supabase/types.ts
+      - name: Export anon key
+        run: echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$(pnpm -s exec supabase status -o json | jq -r .ANON_KEY)" >> "$GITHUB_ENV"
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+        env: { CI: "1" }
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-report, path: playwright-report }
