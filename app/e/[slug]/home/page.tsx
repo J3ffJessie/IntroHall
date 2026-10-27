@@ -4,6 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { AttendeeShell } from "@/components/events/attendee-shell";
 import { MatchCard } from "@/components/events/match-card";
 import { getAttendance } from "@/lib/attendance";
+import { connectionMap } from "@/lib/connection-state";
+import { inboxCount } from "@/lib/inbox";
 
 export const metadata: Metadata = { title: "Matches", robots: { index: false } };
 
@@ -23,14 +25,17 @@ export default async function MatchesPage({ params, searchParams }:
 
   const tab = sp.tab === "everyone" ? "everyone" : "matches";
   const page = Math.max(0, Number.parseInt(sp.page ?? "0", 10) || 0);
-  const [{ data: tags }, { data: people, error }] = await Promise.all([
+  const [{ data: tags }, { data: people, error }, { data: connections }, badge] = await Promise.all([
     supabase.rpc("get_event_tag_counts", { p_event_id: event.id }),
     supabase.rpc("get_matches", {
       p_event_id: event.id, p_mode: tab, p_tag: sp.tag || undefined,
       // One extra row tells us whether there is a next page.
       p_limit: PAGE_SIZE + 1, p_offset: page * PAGE_SIZE,
     }),
+    supabase.rpc("get_connections", { p_event_id: event.id }),
+    inboxCount(supabase, event.id),
   ]);
+  const conn = connectionMap(connections ?? []);
   if (error) throw new Error(error.message);
   const rows = (people ?? []).slice(0, PAGE_SIZE);
   const hasNext = (people ?? []).length > PAGE_SIZE;
@@ -48,7 +53,7 @@ export default async function MatchesPage({ params, searchParams }:
   };
 
   return (
-    <AttendeeShell eventName={event.name} current="matches">
+    <AttendeeShell eventName={event.name} current="matches" inboxCount={badge} userId={user.id} liveEvents={["request", "conversation"]}>
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">{tab === "matches" ? "People who share your interests" : "Everyone else"}</h1>
         <p className="text-muted">
@@ -99,7 +104,7 @@ export default async function MatchesPage({ params, searchParams }:
         <ul className="flex flex-col gap-3" aria-label={tab === "matches" ? "Matches" : "Everyone"}>
           {rows.map((p) => (
             <li key={p.attendee_id}>
-              <MatchCard person={p} />
+              <MatchCard person={p} slug={slug} connection={conn.get(p.attendee_id) ?? { state: "none" }} />
             </li>
           ))}
         </ul>

@@ -145,6 +145,199 @@ export type Database = {
           },
         ];
       };
+      blocks: {
+        Row: {
+          blocked_attendee: string;
+          blocker_attendee: string;
+          created_at: string;
+          event_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          blocked_attendee: string;
+          blocker_attendee: string;
+          created_at?: string;
+          event_id: string;
+        };
+        Update: {
+          blocked_attendee?: string;
+          blocker_attendee?: string;
+          created_at?: string;
+          event_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "blocks_blocked_attendee_fkey";
+            columns: ["blocked_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "blocks_blocker_attendee_fkey";
+            columns: ["blocker_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "blocks_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      connection_requests: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          from_attendee: string;
+          id: string;
+          note: string;
+          responded_at: string | null;
+          status: string;
+          to_attendee: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          from_attendee: string;
+          id?: string;
+          note?: string;
+          responded_at?: string | null;
+          status?: string;
+          to_attendee: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          from_attendee?: string;
+          id?: string;
+          note?: string;
+          responded_at?: string | null;
+          status?: string;
+          to_attendee?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "connection_requests_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "connection_requests_from_attendee_fkey";
+            columns: ["from_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "connection_requests_to_attendee_fkey";
+            columns: ["to_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      conversation_participants: {
+        Row: {
+          attendee_id: string;
+          conversation_id: string;
+          last_push_at: string | null;
+          last_read_at: string;
+          last_seen_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          attendee_id: string;
+          conversation_id: string;
+          last_push_at?: string | null;
+          last_read_at?: string;
+          last_seen_at?: string | null;
+        };
+        Update: {
+          attendee_id?: string;
+          conversation_id?: string;
+          last_push_at?: string | null;
+          last_read_at?: string;
+          last_seen_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_attendee_id_fkey";
+            columns: ["attendee_id"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "conversations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      conversations: {
+        Row: {
+          attendee_hi: string | null;
+          attendee_lo: string | null;
+          created_at: string;
+          event_id: string;
+          id: string;
+          last_message_at: string | null;
+          read_only_reason: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          attendee_hi?: string | null;
+          attendee_lo?: string | null;
+          created_at?: string;
+          event_id: string;
+          id?: string;
+          last_message_at?: string | null;
+          read_only_reason?: string | null;
+        };
+        Update: {
+          attendee_hi?: string | null;
+          attendee_lo?: string | null;
+          created_at?: string;
+          event_id?: string;
+          id?: string;
+          last_message_at?: string | null;
+          read_only_reason?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "conversations_attendee_hi_fkey";
+            columns: ["attendee_hi"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversations_attendee_lo_fkey";
+            columns: ["attendee_lo"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversations_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       event_assets: {
         Row: {
           alt: string;
@@ -448,6 +641,49 @@ export type Database = {
           },
         ];
       };
+      messages: {
+        Row: {
+          body: string;
+          client_msg_id: string;
+          conversation_id: string;
+          created_at: string;
+          id: string;
+          sender_attendee: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          client_msg_id: string;
+          conversation_id: string;
+          created_at?: string;
+          id?: string;
+          sender_attendee?: string | null;
+        };
+        Update: {
+          body?: string;
+          client_msg_id?: string;
+          conversation_id?: string;
+          created_at?: string;
+          id?: string;
+          sender_attendee?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "conversations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_sender_attendee_fkey";
+            columns: ["sender_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       org_invites: {
         Row: {
           accepted_at: string | null;
@@ -568,6 +804,91 @@ export type Database = {
         };
         Relationships: [];
       };
+      reports: {
+        Row: {
+          event_id: string;
+          id: string;
+          message_id: string | null;
+          message_snapshot: string | null;
+          reason: string;
+          reported_at: string;
+          reporter: string | null;
+          resolution_note: string;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          sender_snapshot: NonNullable<Json>;
+          status: string;
+          target_attendee: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          event_id: string;
+          id?: string;
+          message_id?: string | null;
+          message_snapshot?: string | null;
+          reason: string;
+          reported_at?: string;
+          reporter?: string | null;
+          resolution_note?: string;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          sender_snapshot?: NonNullable<Json>;
+          status?: string;
+          target_attendee?: string | null;
+        };
+        Update: {
+          event_id?: string;
+          id?: string;
+          message_id?: string | null;
+          message_snapshot?: string | null;
+          reason?: string;
+          reported_at?: string;
+          reporter?: string | null;
+          resolution_note?: string;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          sender_snapshot?: NonNullable<Json>;
+          status?: string;
+          target_attendee?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reports_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_message_id_fkey";
+            columns: ["message_id"];
+            isOneToOne: false;
+            referencedRelation: "messages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_reporter_fkey";
+            columns: ["reporter"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reports_resolved_by_fkey";
+            columns: ["resolved_by"];
+            isOneToOne: false;
+            referencedRelation: "accounts";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "reports_target_attendee_fkey";
+            columns: ["target_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -575,6 +896,7 @@ export type Database = {
     Functions: {
       accept_invite: { Args: { p_token: string }; Returns: string };
       archive_event: { Args: { p_event_id: string }; Returns: undefined };
+      block_attendee: { Args: { p_attendee_id: string }; Returns: undefined };
       create_invite: {
         Args: { p_email: string; p_org_id: string; p_role: string };
         Returns: string;
@@ -582,6 +904,34 @@ export type Database = {
       create_organization: {
         Args: { p_name: string; p_slug: string };
         Returns: string;
+      };
+      get_connections: {
+        Args: { p_event_id: string };
+        Returns: {
+          company: string;
+          conversation_id: string;
+          created_at: string;
+          direction: string;
+          full_name: string;
+          headline: string;
+          note: string;
+          other_attendee: string;
+          request_id: string;
+          status: string;
+        }[];
+      };
+      get_conversations: {
+        Args: { p_event_id: string };
+        Returns: {
+          conversation_id: string;
+          full_name: string;
+          headline: string;
+          last_message: string;
+          last_message_at: string;
+          other_attendee: string;
+          read_only_reason: string;
+          unread: number;
+        }[];
       };
       get_event_roster: {
         Args: { p_event_id: string };
@@ -627,6 +977,24 @@ export type Database = {
           shared_tags: string[];
         }[];
       };
+      get_reports: {
+        Args: { p_event_id: string };
+        Returns: {
+          message_snapshot: string;
+          reason: string;
+          report_id: string;
+          reported_at: string;
+          reporter_name: string;
+          resolution_note: string;
+          resolved_at: string;
+          sender_snapshot: Json;
+          status: string;
+          target_attendee: string;
+          target_banned: boolean;
+          target_left: boolean;
+          target_name: string;
+        }[];
+      };
       join_event: {
         Args: { p_code?: string; p_slug: string };
         Returns: {
@@ -644,7 +1012,52 @@ export type Database = {
         Args: { p_org_id: string; p_user_id: string };
         Returns: undefined;
       };
+      report_attendee: {
+        Args: {
+          p_attendee_id: string;
+          p_message_id?: string;
+          p_reason: string;
+        };
+        Returns: string;
+      };
+      resolve_report: {
+        Args: { p_note?: string; p_report_id: string };
+        Returns: undefined;
+      };
+      respond_request: {
+        Args: { p_accept: boolean; p_request_id: string };
+        Returns: string;
+      };
       rotate_join_code: { Args: { p_event_id: string }; Returns: string };
+      send_message: {
+        Args: {
+          p_body: string;
+          p_client_msg_id: string;
+          p_conversation_id: string;
+        };
+        Returns: {
+          body: string;
+          client_msg_id: string;
+          conversation_id: string;
+          created_at: string;
+          id: string;
+          sender_attendee: string | null;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "messages";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      send_request: {
+        Args: { p_note?: string; p_to_attendee: string };
+        Returns: string;
+      };
+      touch_conversation: {
+        Args: { p_conversation_id: string };
+        Returns: undefined;
+      };
       unban_attendee: { Args: { p_attendee_id: string }; Returns: undefined };
       unpublish_event: { Args: { p_event_id: string }; Returns: undefined };
       upsert_interests: {
@@ -655,6 +1068,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      withdraw_request: { Args: { p_request_id: string }; Returns: undefined };
     };
     Enums: {
       [_ in never]: never;

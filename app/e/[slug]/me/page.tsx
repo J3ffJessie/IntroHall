@@ -5,6 +5,7 @@ import { AttendeeShell } from "@/components/events/attendee-shell";
 import { HomeActions } from "@/components/events/home-actions";
 import { buttonClass, Card } from "@/components/ui";
 import { getAttendance } from "@/lib/attendance";
+import { inboxCount } from "@/lib/inbox";
 import { formatEventRange } from "@/lib/time";
 
 export const metadata: Metadata = { title: "My profile", robots: { index: false } };
@@ -17,16 +18,17 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
   if (!user || !active) redirect("/join");
   if (!active.completed_at) redirect("/setup");
 
-  const [{ data: account }, { data: interests }] = await Promise.all([
+  const [{ data: account }, { data: interests }, badge] = await Promise.all([
     supabase.from("accounts").select("full_name, headline, company").eq("user_id", user.id).single(),
     supabase.from("attendee_interests").select("interest_tags(label)").eq("attendee_id", active.id),
+    inboxCount(supabase, event.id),
   ]);
   const labels = (interests ?? []).map((i) => i.interest_tags?.label).filter(Boolean).sort() as string[];
   const hidden = active.visibility === "hidden";
   const archived = event.status === "archived";
 
   return (
-    <AttendeeShell eventName={event.name} current="me">
+    <AttendeeShell eventName={event.name} current="me" inboxCount={badge} userId={user.id}>
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">My profile</h1>
         <p className="text-muted">{formatEventRange(event.starts_at, event.ends_at, event.timezone)}</p>

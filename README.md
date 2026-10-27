@@ -41,6 +41,7 @@ service-worker/push work (Phase 5) to need HTTPS locally.
 | `pnpm test:integration` | Concurrency checks against the local DB, e.g. the attendee cap under 150 parallel joins |
 | `k6 run -e ANON_KEY=… -e SLUG=… load/join.js` | Keynote-burst load test (500 sign-ups + joins/min); needs [k6](https://k6.io) |
 | `node load/seed-matches.mts && k6 run -e ANON_KEY=… load/matches.js` | Matching load test: 5,000 attendees × 20 interests, 50 req/s |
+| `node load/seed-realtime.mts 90 && k6 run -e ANON_KEY=… -e CONNS=180 -e RATE=25 load/realtime.js` | Realtime chat load test. Local Realtime caps 200 connections / 100 events/s; run the 2,000-connection version against the hosted project |
 | `pnpm test:e2e` | Playwright + axe (needs `pnpm db:start`) |
 | `pnpm db:types` | Regenerate `lib/supabase/types.ts` after a migration |
 

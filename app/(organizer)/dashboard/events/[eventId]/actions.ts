@@ -120,5 +120,14 @@ export async function moderateAttendee(eventId: string, attendeeId: string, acti
     : await supabase.rpc("remove_attendee", { p_attendee_id: attendeeId, p_ban: action === "ban" });
   if (error) return friendlyDbError(error);
   revalidatePath(path(eventId, "/attendees"));
+  revalidatePath(path(eventId, "/reports"));
+  return null;
+}
+
+export async function resolveReport(eventId: string, reportId: string, note: string): Promise<string | null> {
+  const { supabase } = await requireUser(path(eventId, "/reports"));
+  const { error } = await supabase.rpc("resolve_report", { p_report_id: reportId, p_note: note });
+  if (error) return friendlyDbError(error);
+  revalidatePath(path(eventId, "/reports"));
   return null;
 }

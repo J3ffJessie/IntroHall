@@ -49,3 +49,18 @@ export async function seedAttendee(eventId: string, opts: { name: string; headli
 export async function rebuildStats() {
   await pool.query("select private.rebuild_dirty_event_stats()");
 }
+
+/** Connects two attendees of an event (accepted request + conversation). Returns the conversation id. */
+export async function seedConversation(eventId: string, userA: string, userB: string): Promise<string> {
+  const { rows } = await pool.query(
+    "select id, user_id from public.attendees where event_id = $1 and user_id = any($2::uuid[])", [eventId, [userA, userB]]);
+  const a = rows.find((r) => r.user_id === userA).id;
+  const b = rows.find((r) => r.user_id === userB).id;
+  await pool.query(`insert into public.connection_requests (event_id, from_attendee, to_attendee, status, responded_at)
+                    values ($1, $2, $3, 'accepted', now())`, [eventId, a, b]);
+  const { rows: [c] } = await pool.query(
+    `insert into public.conversations (event_id, attendee_lo, attendee_hi) values ($1, least($2::uuid, $3::uuid), greatest($2::uuid, $3::uuid))
+     returning id`, [eventId, a, b]);
+  await pool.query("insert into public.conversation_participants (conversation_id, attendee_id) values ($1, $2), ($1, $3)", [c.id, a, b]);
+  return c.id;
+}

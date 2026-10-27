@@ -43,3 +43,37 @@ export async function leaveEvent(slug: string): Promise<void> {
   await supabase.rpc("leave_event", { p_event_id: event.id });
   redirect("/");
 }
+
+// ---- Connections, blocks, reports (Phase 4). Each RPC re-checks the caller in the database.
+
+export async function sendConnectionRequest(slug: string, attendeeId: string, note: string): Promise<string | null> {
+  const { supabase } = await requireActive(slug);
+  const { error } = await supabase.rpc("send_request", { p_to_attendee: attendeeId, p_note: note.slice(0, 280) });
+  return error ? friendlyDbError(error) : null;
+}
+
+export async function respondToRequest(slug: string, requestId: string, accept: boolean): Promise<{ error?: string; conversationId?: string }> {
+  const { supabase } = await requireActive(slug);
+  const { data, error } = await supabase.rpc("respond_request", { p_request_id: requestId, p_accept: accept });
+  return error ? { error: friendlyDbError(error) } : { conversationId: data ?? undefined };
+}
+
+export async function withdrawConnectionRequest(slug: string, requestId: string): Promise<string | null> {
+  const { supabase } = await requireActive(slug);
+  const { error } = await supabase.rpc("withdraw_request", { p_request_id: requestId });
+  return error ? friendlyDbError(error) : null;
+}
+
+export async function blockAttendee(slug: string, attendeeId: string): Promise<string | null> {
+  const { supabase } = await requireActive(slug);
+  const { error } = await supabase.rpc("block_attendee", { p_attendee_id: attendeeId });
+  return error ? friendlyDbError(error) : null;
+}
+
+export async function reportAttendee(slug: string, attendeeId: string, reason: string, messageId?: string): Promise<string | null> {
+  const { supabase } = await requireActive(slug);
+  const { error } = await supabase.rpc("report_attendee", {
+    p_attendee_id: attendeeId, p_reason: reason, p_message_id: messageId,
+  });
+  return error ? friendlyDbError(error) : null;
+}

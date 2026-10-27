@@ -14,6 +14,7 @@ select is(
            or (has_function_privilege('authenticated', p.oid, 'execute')
                and p.proname not in ('my_org_ids', 'my_admin_org_ids', 'my_org_event_ids',
                                      'my_event_ids', 'my_attendee_ids',
+                                     'my_blocked_attendee_ids', 'my_conversation_ids',
                                      'is_valid_slug', 'normalize_tag')))),
   '{}'::text[],
   'no private.* function is executable by anon, and authenticated only gets policy helpers');

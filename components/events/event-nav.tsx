@@ -9,6 +9,7 @@ const tabs = [
   { href: "/branding", label: "Branding" },
   { href: "/tags", label: "Interests" },
   { href: "/attendees", label: "Attendees" },
+  { href: "/reports", label: "Reports" },
   { href: "/access", label: "Access & QR" },
 ];
 

@@ -59,7 +59,7 @@ test("attendee joins, sets up a profile, and the organizer can ban them", async 
   // Saving lands on matches (empty so far); the profile page shows the saved interests.
   await expect(att.getByRole("heading", { name: "People who share your interests" })).toBeVisible();
   await expect(att.getByText("No one shares your interests yet.")).toBeVisible();
-  await att.getByRole("link", { name: "My profile" }).click();
+  await att.getByRole("link", { name: "Profile", exact: true }).click();
   await expect(att.getByRole("heading", { name: "My profile" })).toBeVisible();
   const chips = att.getByRole("list", { name: "Your interests" });
   for (const l of ["AI", "Espresso", "Machine Learning", "Rust"]) await expect(chips.getByText(l, { exact: true })).toBeVisible();

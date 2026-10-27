@@ -1,4 +1,7 @@
+import { ConnectButton, type Connection } from "./connect-button";
+
 type Person = {
+  attendee_id: string;
   full_name: string;
   headline: string;
   company: string;
@@ -11,7 +14,7 @@ function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
 }
 
-export function MatchCard({ person: p }: { person: Person }) {
+export function MatchCard({ person: p, slug, connection }: { person: Person; slug: string; connection: Connection }) {
   const role = [p.headline, p.company].filter(Boolean).join(" · ");
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm">
@@ -33,6 +36,7 @@ export function MatchCard({ person: p }: { person: Person }) {
       )}
       {p.looking_for && <p className="text-sm"><span className="font-medium">Looking for:</span> {p.looking_for}</p>}
       {p.bio && <p className="line-clamp-3 text-sm text-muted">{p.bio}</p>}
+      <ConnectButton slug={slug} attendeeId={p.attendee_id} name={p.full_name} connection={connection} />
     </article>
   );
 }
