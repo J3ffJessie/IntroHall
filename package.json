@@ -16,7 +16,10 @@
     "db:lint": "squawk supabase/migrations/*.sql",
     "db:types": "supabase gen types typescript --local --schema public > lib/supabase/types.ts && prettier --write lib/supabase/types.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "seed:attendees": "node scripts/seed-attendees.mts"
+    "seed:attendees": "node scripts/seed-attendees.mts",
+    "test:push": "cd supabase/functions && deno check send-push/index.ts && deno test -A send-push/",
+    "dev:https": "NODE_OPTIONS=--use-system-ca NEXT_PUBLIC_DEV_HTTPS=1 next dev --turbopack -H 0.0.0.0 --experimental-https --experimental-https-key certs/localtest-key.pem --experimental-https-cert certs/localtest.pem",
+    "test:e2e:https": "E2E_HTTPS=1 playwright test e2e/pwa.spec.ts e2e/announcements.spec.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

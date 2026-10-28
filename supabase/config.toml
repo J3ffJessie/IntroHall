@@ -161,7 +161,7 @@ site_url = "http://app.localtest.me:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://*.localtest.me:3000/**", "http://localtest.me:3000/**"]
+additional_redirect_urls = ["http://*.localtest.me:3000/**", "http://localtest.me:3000/**", "https://*.localtest.me:3000/**", "https://localtest.me:3000/**"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -407,8 +407,11 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+# Values come from supabase/.env (git-ignored). Production: `supabase secrets set`.
+[edge_runtime.secrets]
+VAPID_PUBLIC_KEY = "env(VAPID_PUBLIC_KEY)"
+VAPID_PRIVATE_KEY = "env(VAPID_PRIVATE_KEY)"
+VAPID_SUBJECT = "env(VAPID_SUBJECT)"
 
 [analytics]
 enabled = true

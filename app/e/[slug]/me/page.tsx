@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AttendeeShell } from "@/components/events/attendee-shell";
 import { HomeActions } from "@/components/events/home-actions";
+import { PushSettings } from "@/components/events/push-settings";
+import { SignOutButton } from "@/components/events/sign-out-button";
 import { buttonClass, Card } from "@/components/ui";
 import { getAttendance } from "@/lib/attendance";
 import { inboxCount } from "@/lib/inbox";
@@ -57,8 +59,12 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
         </ul>
       </Card>
 
+      {!archived && <PushSettings eventId={event.id} />}
       {!archived && <HomeActions slug={slug} hidden={hidden} eventName={event.name} />}
-      <Link href="/" className={`${buttonClass.secondary} w-fit`}>Event page</Link>
+      <div className="flex items-center justify-between">
+        <Link href="/" className={`${buttonClass.secondary} w-fit`}>Event page</Link>
+        <SignOutButton />
+      </div>
     </AttendeeShell>
   );
 }

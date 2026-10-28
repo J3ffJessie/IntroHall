@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AttendeeShell } from "@/components/events/attendee-shell";
+import { AnnouncementList, sortAnnouncements } from "@/components/events/announcement-list";
 import { MatchCard } from "@/components/events/match-card";
+import { PushPrompt } from "@/components/events/push-settings";
+import { LiveRefresh } from "@/components/live-refresh";
 import { getAttendance } from "@/lib/attendance";
 import { connectionMap } from "@/lib/connection-state";
 import { inboxCount } from "@/lib/inbox";
@@ -25,7 +28,7 @@ export default async function MatchesPage({ params, searchParams }:
 
   const tab = sp.tab === "everyone" ? "everyone" : "matches";
   const page = Math.max(0, Number.parseInt(sp.page ?? "0", 10) || 0);
-  const [{ data: tags }, { data: people, error }, { data: connections }, badge] = await Promise.all([
+  const [{ data: tags }, { data: people, error }, { data: connections }, badge, { data: announcements }] = await Promise.all([
     supabase.rpc("get_event_tag_counts", { p_event_id: event.id }),
     supabase.rpc("get_matches", {
       p_event_id: event.id, p_mode: tab, p_tag: sp.tag || undefined,
@@ -34,8 +37,13 @@ export default async function MatchesPage({ params, searchParams }:
     }),
     supabase.rpc("get_connections", { p_event_id: event.id }),
     inboxCount(supabase, event.id),
+    supabase.from("announcements").select("id, title, body, pinned, published_at")
+      .eq("event_id", event.id).not("published_at", "is", null),
   ]);
   const conn = connectionMap(connections ?? []);
+  // Pinned posts plus the newest one; the rest live on /announcements.
+  const sortedAnnouncements = sortAnnouncements(announcements ?? []);
+  const topAnnouncements = sortedAnnouncements.filter((a, i) => a.pinned || i === sortedAnnouncements.findIndex((x) => !x.pinned)).slice(0, 3);
   if (error) throw new Error(error.message);
   const rows = (people ?? []).slice(0, PAGE_SIZE);
   const hasNext = (people ?? []).length > PAGE_SIZE;
@@ -54,6 +62,19 @@ export default async function MatchesPage({ params, searchParams }:
 
   return (
     <AttendeeShell eventName={event.name} current="matches" inboxCount={badge} userId={user.id} liveEvents={["request", "conversation"]}>
+      <LiveRefresh topic={`event:${event.id}`} events={["announcement"]} />
+      {event.status === "published" && <PushPrompt eventId={event.id} />}
+      {topAnnouncements.length > 0 && page === 0 && (
+        <section aria-labelledby="latest-announcements" className="flex flex-col gap-2">
+          <div className="flex items-baseline justify-between">
+            <h2 id="latest-announcements" className="text-sm font-semibold uppercase tracking-wide text-muted">Announcements</h2>
+            {sortedAnnouncements.length > topAnnouncements.length && (
+              <Link href="/announcements" className="text-sm text-primary underline">See all ({sortedAnnouncements.length})</Link>
+            )}
+          </div>
+          <AnnouncementList items={topAnnouncements} timeZone={event.timezone} />
+        </section>
+      )}
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">{tab === "matches" ? "People who share your interests" : "Everyone else"}</h1>
         <p className="text-muted">

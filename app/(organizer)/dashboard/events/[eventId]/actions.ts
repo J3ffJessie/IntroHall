@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth/require-user";
 import { friendlyDbError } from "@/lib/db-errors";
+import { parseAnnouncementForm } from "@/lib/announcement-form";
 import { parseEventForm } from "@/lib/event-form";
 import { done, fail, type FormState } from "@/lib/form-state";
 import { normalizeTagLabel } from "@/lib/tags";
@@ -130,4 +131,48 @@ export async function resolveReport(eventId: string, reportId: string, note: str
   if (error) return friendlyDbError(error);
   revalidatePath(path(eventId, "/reports"));
   return null;
+}
+
+// ---- Announcements (Phase 5). Publishing goes through publish_announcement() so the push job
+// and the realtime broadcast are enqueued in the same transaction as the claim.
+
+async function revalidateAnnouncements(eventId: string) {
+  revalidatePath(path(eventId, "/announcements"));
+  await revalidatePublic(eventId);
+}
+
+export async function createAnnouncement(eventId: string, timeZone: string, _prev: FormState, form: FormData): Promise<FormState> {
+  const parsed = parseAnnouncementForm(form, timeZone);
+  if (!parsed.success) return fail(parsed.error.issues[0].message);
+  const { supabase } = await requireUser(path(eventId, "/announcements"));
+  const { title, body, pinned, publish_at, now } = parsed.data;
+  const { data, error } = await supabase.from("announcements")
+    .insert({ event_id: eventId, title, body, pinned, publish_at }).select("id").single();
+  if (error) return fail(friendlyDbError(error));
+  if (now) {
+    const { error: pubErr } = await supabase.rpc("publish_announcement", { p_announcement_id: data.id });
+    if (pubErr) return fail(friendlyDbError(pubErr));
+  }
+  await revalidateAnnouncements(eventId);
+  return done(now ? "Posted. Attendees with notifications on will get a push." : "Scheduled.");
+}
+
+export async function publishAnnouncementNow(eventId: string, id: string): Promise<string | null> {
+  const { supabase } = await requireUser(path(eventId, "/announcements"));
+  const { error } = await supabase.rpc("publish_announcement", { p_announcement_id: id });
+  if (error) return friendlyDbError(error);
+  await revalidateAnnouncements(eventId);
+  return null;
+}
+
+export async function setAnnouncementPinned(eventId: string, id: string, pinned: boolean): Promise<void> {
+  const { supabase } = await requireUser(path(eventId, "/announcements"));
+  await supabase.from("announcements").update({ pinned }).eq("id", id);
+  await revalidateAnnouncements(eventId);
+}
+
+export async function deleteAnnouncement(eventId: string, id: string): Promise<void> {
+  const { supabase } = await requireUser(path(eventId, "/announcements"));
+  await supabase.from("announcements").delete().eq("id", id);
+  await revalidateAnnouncements(eventId);
 }

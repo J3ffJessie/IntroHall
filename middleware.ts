@@ -44,5 +44,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|.*\\.(?:png|jpg|jpeg|webp|svg|ico)$).*)"],
+  // manifest.webmanifest is NOT excluded: on event hosts it rewrites to the per-event manifest route.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|.*\\.(?:png|jpg|jpeg|webp|svg|ico)$).*)"],
 };

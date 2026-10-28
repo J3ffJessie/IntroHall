@@ -46,3 +46,4 @@ supabase/.env
 .omc/
 /load/.matches-fixture.json
 /load/.realtime-fixture.json
+/.vitest/

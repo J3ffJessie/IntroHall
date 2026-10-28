@@ -7,9 +7,18 @@ export type OutboxItem = {
   conversation_id: string;
   body: string;
   created_at: string;
+  /** Enqueue order. Assigned by enqueue(); timestamps alone can tie within a millisecond. */
+  seq?: number;
   /** Set when the server rejected the message for good (e.g. conversation became read-only). */
   error?: string;
 };
+
+let lastSeq = 0;
+/** Strictly increasing across calls in this tab, and roughly time-ordered across tabs. */
+function nextSeq(): number {
+  lastSeq = Math.max(lastSeq + 1, Date.now() * 1000);
+  return lastSeq;
+}
 
 const DB_NAME = "introhall-outbox";
 const STORE = "messages";
@@ -42,7 +51,7 @@ async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBReq
 }
 
 export async function enqueue(item: OutboxItem): Promise<void> {
-  await tx("readwrite", (s) => s.put(item));
+  await tx("readwrite", (s) => s.put({ ...item, seq: item.seq ?? nextSeq() }));
 }
 
 export async function remove(clientMsgId: string): Promise<void> {
@@ -52,7 +61,7 @@ export async function remove(clientMsgId: string): Promise<void> {
 export async function list(conversationId?: string): Promise<OutboxItem[]> {
   const all = (await tx<OutboxItem[]>("readonly", (s) =>
     conversationId ? s.index("conversation_id").getAll(conversationId) : s.getAll())) ?? [];
-  return all.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  return all.sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0) || a.created_at.localeCompare(b.created_at));
 }
 
 export type SendResult = { ok: true } | { ok: false; retry: boolean; error: string };

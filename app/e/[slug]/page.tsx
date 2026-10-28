@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { BannerFrame } from "@/components/events/banner-frame";
 import { JoinButton, joinButtonClass } from "@/components/events/join-button";
+import { PublicAnnouncements } from "@/components/events/public-announcements";
 import { getPublicEvent } from "@/lib/public-event";
 import { formatEventRange } from "@/lib/time";
 
@@ -88,6 +89,8 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             </Suspense>
           )}
         </section>
+
+        <PublicAnnouncements eventId={event.id} timeZone={event.timezone} />
 
         {event.description && (
           <section aria-labelledby="about" className="flex flex-col gap-2">

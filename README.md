@@ -27,8 +27,23 @@ Hosts (`*.localtest.me` resolves to 127.0.0.1, so subdomains work without /etc/h
 | `http://app.localtest.me:3000` | organizer dashboard, profile, sign-in |
 | `http://{slug}.localtest.me:3000` | event pages (rewritten to `/e/{slug}`) |
 
-Dev hosts are plain HTTP, so browsers don't treat them as secure contexts: avoid `crypto.randomUUID`, and expect
-service-worker/push work (Phase 5) to need HTTPS locally.
+Dev hosts are plain HTTP, so browsers don't treat them as secure contexts: avoid `crypto.randomUUID`. Service
+workers, offline caching and push need HTTPS:
+
+```bash
+# one time
+sudo pacman -S mkcert nss && mkcert -install
+mkdir -p certs && mkcert -cert-file certs/localtest.pem -key-file certs/localtest-key.pem \
+  "localtest.me" "*.localtest.me" localhost 127.0.0.1
+
+pnpm dev:https                         # https://app.localtest.me:3000, https://{slug}.localtest.me:3000
+pnpm exec supabase functions serve     # Edge Functions (send-push) with hot reload + logs
+```
+
+Push pipeline: triggers queue jobs in pgmq → `pg_cron` (every 10 s) → `pg_net` → `send-push` Edge Function →
+Web Push. Local worker URL and service key are set by `supabase/seed.sql`; VAPID keys live in `supabase/.env`
+(public key also in `.env.local` as `NEXT_PUBLIC_VAPID_PUBLIC_KEY`). Production: `supabase secrets set VAPID_…` and
+insert `push_worker_url` / `service_role_key` into `private.secrets`.
 
 ## Checks
 
@@ -43,6 +58,8 @@ service-worker/push work (Phase 5) to need HTTPS locally.
 | `node load/seed-matches.mts && k6 run -e ANON_KEY=… load/matches.js` | Matching load test: 5,000 attendees × 20 interests, 50 req/s |
 | `node load/seed-realtime.mts 90 && k6 run -e ANON_KEY=… -e CONNS=180 -e RATE=25 load/realtime.js` | Realtime chat load test. Local Realtime caps 200 connections / 100 events/s; run the 2,000-connection version against the hosted project |
 | `pnpm test:e2e` | Playwright + axe (needs `pnpm db:start`) |
+| `pnpm test:e2e:https` | Service-worker/offline + announcements e2e over HTTPS (needs mkcert certs) |
+| `pnpm test:push` | `send-push` worker (Deno) against the local DB and a mock push service |
 | `pnpm db:types` | Regenerate `lib/supabase/types.ts` after a migration |
 
 ## Security model (summary)

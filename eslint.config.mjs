@@ -18,6 +18,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Deno code: checked with `deno check` / `deno test` (pnpm test:push).
+      "supabase/functions/**",
     ],
   },
 ];

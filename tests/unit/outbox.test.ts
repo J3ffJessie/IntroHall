@@ -15,8 +15,9 @@ describe("outbox", () => {
   it("keeps messages while offline and sends each exactly once when back online", async () => {
     const a = item("one");
     const b = item("two");
+    // Same-millisecond timestamps: order must come from enqueue order, not created_at.
+    b.created_at = a.created_at;
     await enqueue(a);
-    await new Promise((r) => setTimeout(r, 2));
     await enqueue(b);
 
     let online = false;
@@ -41,7 +42,6 @@ describe("outbox", () => {
 
   it("marks permanently rejected messages and continues with the rest", async () => {
     await enqueue(item("rejected"));
-    await new Promise((r) => setTimeout(r, 2));
     await enqueue(item("fine"));
     const sent = await flush(async (i) =>
       i.body === "rejected" ? { ok: false, retry: false, error: "read-only" } : { ok: true });

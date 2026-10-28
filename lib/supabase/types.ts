@@ -46,6 +46,64 @@ export type Database = {
         };
         Relationships: [];
       };
+      announcements: {
+        Row: {
+          author_user: string | null;
+          body: string;
+          created_at: string;
+          event_id: string;
+          id: string;
+          pinned: boolean;
+          publish_at: string | null;
+          published_at: string | null;
+          push_enqueued_at: string | null;
+          title: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_user?: string | null;
+          body?: string;
+          created_at?: string;
+          event_id: string;
+          id?: string;
+          pinned?: boolean;
+          publish_at?: string | null;
+          published_at?: string | null;
+          push_enqueued_at?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          author_user?: string | null;
+          body?: string;
+          created_at?: string;
+          event_id?: string;
+          id?: string;
+          pinned?: boolean;
+          publish_at?: string | null;
+          published_at?: string | null;
+          push_enqueued_at?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "announcements_author_user_fkey";
+            columns: ["author_user"];
+            isOneToOne: false;
+            referencedRelation: "accounts";
+            referencedColumns: ["user_id"];
+          },
+          {
+            foreignKeyName: "announcements_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       attendee_interests: {
         Row: {
           attendee_id: string;
@@ -804,6 +862,79 @@ export type Database = {
         };
         Relationships: [];
       };
+      push_subscription_events: {
+        Row: {
+          event_id: string;
+          subscription_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          event_id: string;
+          subscription_id: string;
+        };
+        Update: {
+          event_id?: string;
+          subscription_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "push_subscription_events_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "push_subscription_events_subscription_id_fkey";
+            columns: ["subscription_id"];
+            isOneToOne: false;
+            referencedRelation: "push_subscriptions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      push_subscriptions: {
+        Row: {
+          auth: string;
+          created_at: string;
+          endpoint: string;
+          id: string;
+          last_success_at: string | null;
+          p256dh: string;
+          user_agent: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          auth: string;
+          created_at?: string;
+          endpoint: string;
+          id?: string;
+          last_success_at?: string | null;
+          p256dh: string;
+          user_agent?: string;
+          user_id: string;
+        };
+        Update: {
+          auth?: string;
+          created_at?: string;
+          endpoint?: string;
+          id?: string;
+          last_success_at?: string | null;
+          p256dh?: string;
+          user_agent?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "accounts";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
       reports: {
         Row: {
           event_id: string;
@@ -1003,6 +1134,10 @@ export type Database = {
         }[];
       };
       leave_event: { Args: { p_event_id: string }; Returns: undefined };
+      publish_announcement: {
+        Args: { p_announcement_id: string };
+        Returns: undefined;
+      };
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
       remove_attendee: {
         Args: { p_attendee_id: string; p_ban?: boolean };
@@ -1010,6 +1145,10 @@ export type Database = {
       };
       remove_org_member: {
         Args: { p_org_id: string; p_user_id: string };
+        Returns: undefined;
+      };
+      remove_push_subscription: {
+        Args: { p_endpoint: string };
         Returns: undefined;
       };
       report_attendee: {
@@ -1029,6 +1168,16 @@ export type Database = {
         Returns: string;
       };
       rotate_join_code: { Args: { p_event_id: string }; Returns: string };
+      save_push_subscription: {
+        Args: {
+          p_auth: string;
+          p_endpoint: string;
+          p_event_id: string;
+          p_p256dh: string;
+          p_user_agent?: string;
+        };
+        Returns: undefined;
+      };
       send_message: {
         Args: {
           p_body: string;
