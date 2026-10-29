@@ -64,3 +64,12 @@ export async function seedConversation(eventId: string, userA: string, userB: st
   await pool.query("insert into public.conversation_participants (conversation_id, attendee_id) values ($1, $2), ($1, $3)", [c.id, a, b]);
   return c.id;
 }
+
+export async function makePlatformAdmin(userId: string) {
+  await pool.query("insert into public.platform_admins (user_id) values ($1) on conflict do nothing", [userId]);
+}
+
+export async function authUserCount(email: string): Promise<number> {
+  const { rows } = await pool.query("select count(*)::int as n from auth.users where email = $1", [email]);
+  return rows[0].n;
+}

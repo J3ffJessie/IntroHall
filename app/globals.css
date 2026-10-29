@@ -28,6 +28,9 @@
   --success-soft: #f0fdf4;
   --warning-fg: #92400e;
   --warning-soft: #fffbeb;
+
+  /* Single-series chart marks (validated vs the surface in each mode). */
+  --chart-1: #4f46e5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,6 +55,8 @@
     --success-soft: #0c2716;
     --warning-fg: #fcd34d;
     --warning-soft: #2a1f0a;
+
+    --chart-1: #6366f1;
   }
 }
 
@@ -74,6 +79,7 @@
   --color-success-soft: var(--success-soft);
   --color-warning-fg: var(--warning-fg);
   --color-warning-soft: var(--warning-soft);
+  --color-chart-1: var(--chart-1);
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 

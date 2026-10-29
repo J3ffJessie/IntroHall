@@ -8,6 +8,7 @@ import { SignOutButton } from "@/components/events/sign-out-button";
 import { buttonClass, Card } from "@/components/ui";
 import { getAttendance } from "@/lib/attendance";
 import { inboxCount } from "@/lib/inbox";
+import { PROTOCOL, ROOT_DOMAIN } from "@/lib/env";
 import { formatEventRange } from "@/lib/time";
 
 export const metadata: Metadata = { title: "My profile", robots: { index: false } };
@@ -61,6 +62,10 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
 
       {!archived && <PushSettings eventId={event.id} />}
       {!archived && <HomeActions slug={slug} hidden={hidden} eventName={event.name} />}
+      <p className="text-sm text-muted">
+        Download your data or delete your account in{" "}
+        <a href={`${PROTOCOL}://app.${ROOT_DOMAIN}/profile`} className="text-primary underline">your IntroHall account</a>.
+      </p>
       <div className="flex items-center justify-between">
         <Link href="/" className={`${buttonClass.secondary} w-fit`}>Event page</Link>
         <SignOutButton />

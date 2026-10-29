@@ -8,16 +8,23 @@ export const metadata: Metadata = { title: "Interests" };
 export default async function TagsPage({ params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
   const { event, supabase } = await getOrgEvent(eventId);
-  const { data: tags } = await supabase.from("interest_tags").select("id, label, is_official, hidden")
-    .eq("event_id", eventId).is("merged_into", null).order("is_official", { ascending: false }).order("label");
+  const [{ data: tags }, { data: merged }] = await Promise.all([
+    supabase.from("interest_tags").select("id, label, is_official, hidden")
+      .eq("event_id", eventId).is("merged_into", null).order("is_official", { ascending: false }).order("label"),
+    supabase.from("interest_tags").select("id, label, merged_into")
+      .eq("event_id", eventId).not("merged_into", "is", null).order("label"),
+  ]);
+  const labelOf = new Map((tags ?? []).map((t) => [t.id, t.label]));
 
   return (
     <main>
       <Card title="Interests">
         <p className="text-sm text-muted">
-          Attendees pick from these when they join. Hidden interests disappear from pickers and profiles.
+          Attendees pick from these when they join. Hidden interests disappear from pickers, profiles and match scores. Merge duplicates
+          (like “JS” and “JavaScript”) to move everyone onto one interest.
         </p>
-        <TagManager eventId={eventId} tags={tags ?? []} disabled={event.status === "archived"} />
+        <TagManager eventId={eventId} tags={tags ?? []} disabled={event.status === "archived"}
+                    merged={(merged ?? []).map((m) => ({ label: m.label, into: labelOf.get(m.merged_into!) ?? "another interest" }))} />
       </Card>
     </main>
   );

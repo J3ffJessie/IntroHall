@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth/require-user";
 import { friendlyDbError } from "@/lib/db-errors";
@@ -96,6 +97,31 @@ export async function setTagHidden(eventId: string, tagId: string, hidden: boole
   await supabase.from("interest_tags").update({ hidden }).eq("id", tagId).eq("event_id", eventId);
   revalidatePath(path(eventId, "/tags"));
   await revalidatePublic(eventId);
+}
+
+export async function mergeTags(eventId: string, _prev: FormState, form: FormData): Promise<FormState> {
+  const from = String(form.get("from") ?? "");
+  const into = String(form.get("into") ?? "");
+  if (!from || !into) return fail("Pick both interests");
+  if (from === into) return fail("Pick two different interests");
+  const { supabase } = await requireUser(path(eventId, "/tags"));
+  const { error } = await supabase.rpc("merge_tags", { p_from: from, p_into: into });
+  if (error) return fail(friendlyDbError(error));
+  revalidatePath(path(eventId, "/tags"));
+  await revalidatePublic(eventId);
+  return done("Merged. Everyone who picked it now has the other interest.");
+}
+
+/** Soft delete: restorable from the organization page for 30 days, then purged with its images. */
+export async function deleteEvent(eventId: string, orgId: string): Promise<string | null> {
+  const { supabase } = await requireUser(path(eventId));
+  // Read the slug while the event is still visible, to drop its cached public page.
+  const { data: ev } = await supabase.from("events").select("slug").eq("id", eventId).maybeSingle();
+  const { error } = await supabase.rpc("delete_event", { p_event_id: eventId });
+  if (error) return friendlyDbError(error);
+  if (ev) revalidatePath(`/e/${ev.slug}`);
+  revalidatePath(`/dashboard/orgs/${orgId}`);
+  redirect(`/dashboard/orgs/${orgId}`);
 }
 
 export async function setJoinMode(eventId: string, mode: "open" | "code"): Promise<string | null> {

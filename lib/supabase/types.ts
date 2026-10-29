@@ -835,6 +835,7 @@ export type Database = {
         Row: {
           attendee_limit: number | null;
           created_at: string;
+          deleted_at: string | null;
           id: string;
           name: string;
           plan: string;
@@ -845,6 +846,7 @@ export type Database = {
         Insert: {
           attendee_limit?: number | null;
           created_at?: string;
+          deleted_at?: string | null;
           id?: string;
           name: string;
           plan?: string;
@@ -854,11 +856,28 @@ export type Database = {
         Update: {
           attendee_limit?: number | null;
           created_at?: string;
+          deleted_at?: string | null;
           id?: string;
           name?: string;
           plan?: string;
           slug?: string;
           suspended_at?: string | null;
+        };
+        Relationships: [];
+      };
+      platform_admins: {
+        Row: {
+          created_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          user_id?: string;
         };
         Relationships: [];
       };
@@ -1026,6 +1045,47 @@ export type Database = {
     };
     Functions: {
       accept_invite: { Args: { p_token: string }; Returns: string };
+      account_deletion_blockers: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          name: string;
+          org_id: string;
+        }[];
+      };
+      admin_find_users: {
+        Args: { p_email: string };
+        Returns: {
+          created_at: string;
+          email: string;
+          events: number;
+          full_name: string;
+          suspended: boolean;
+          user_id: string;
+        }[];
+      };
+      admin_list_orgs: {
+        Args: { p_search?: string };
+        Returns: {
+          created_at: string;
+          deleted_at: string;
+          events: number;
+          members: number;
+          name: string;
+          org_id: string;
+          owners: string[];
+          slug: string;
+          suspended_at: string;
+        }[];
+      };
+      admin_set_org_suspended: {
+        Args: { p_org_id: string; p_suspended: boolean };
+        Returns: string[];
+      };
+      admin_set_user_suspended: {
+        Args: { p_suspended: boolean; p_user_id: string };
+        Returns: undefined;
+      };
+      am_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       archive_event: { Args: { p_event_id: string }; Returns: undefined };
       block_attendee: { Args: { p_attendee_id: string }; Returns: undefined };
       create_invite: {
@@ -1036,6 +1096,10 @@ export type Database = {
         Args: { p_name: string; p_slug: string };
         Returns: string;
       };
+      delete_account_data: { Args: { p_user_id: string }; Returns: undefined };
+      delete_event: { Args: { p_event_id: string }; Returns: undefined };
+      delete_organization: { Args: { p_org_id: string }; Returns: undefined };
+      export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
       get_connections: {
         Args: { p_event_id: string };
         Returns: {
@@ -1064,6 +1128,17 @@ export type Database = {
           unread: number;
         }[];
       };
+      get_deleted_events: {
+        Args: { p_org_id: string };
+        Returns: {
+          deleted_at: string;
+          event_id: string;
+          name: string;
+          purge_after: string;
+          slug: string;
+        }[];
+      };
+      get_event_analytics: { Args: { p_event_id: string }; Returns: Json };
       get_event_roster: {
         Args: { p_event_id: string };
         Returns: {
@@ -1134,11 +1209,24 @@ export type Database = {
         }[];
       };
       leave_event: { Args: { p_event_id: string }; Returns: undefined };
+      merge_tags: {
+        Args: { p_from: string; p_into: string };
+        Returns: undefined;
+      };
       publish_announcement: {
         Args: { p_announcement_id: string };
         Returns: undefined;
       };
       publish_event: { Args: { p_event_id: string }; Returns: undefined };
+      purge_deleted_orgs: { Args: Record<PropertyKey, never>; Returns: number };
+      purge_event: { Args: { p_event_id: string }; Returns: undefined };
+      purge_targets: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          event_id: string;
+          org_id: string;
+        }[];
+      };
       remove_attendee: {
         Args: { p_attendee_id: string; p_ban?: boolean };
         Returns: undefined;
@@ -1167,6 +1255,7 @@ export type Database = {
         Args: { p_accept: boolean; p_request_id: string };
         Returns: string;
       };
+      restore_event: { Args: { p_event_id: string }; Returns: undefined };
       rotate_join_code: { Args: { p_event_id: string }; Returns: string };
       save_push_subscription: {
         Args: {

@@ -28,6 +28,7 @@ const READ_ONLY_TEXT: Record<string, string> = {
   blocked: "This conversation is closed because one of you blocked the other.",
   left: "This conversation is read-only because someone left the event.",
   event_closed: "This event has ended; the conversation is read-only.",
+  account_deleted: "This person deleted their account; the conversation is read-only.",
 };
 const HEARTBEAT_MS = 30_000;
 const PAGE = 50;

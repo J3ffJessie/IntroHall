@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Card, StatusBadge } from "@/components/ui";
+import { DeleteEventButton } from "@/components/events/delete-event-button";
 import { StatusControls } from "@/components/events/status-controls";
 import { PROTOCOL, ROOT_DOMAIN } from "@/lib/env";
 import { getOrgEvent } from "@/lib/org-event";
@@ -44,6 +45,15 @@ export default async function EventOverviewPage({ params }: { params: Promise<{ 
               </li>
             ))}
           </ul>
+        </Card>
+      )}
+      {role !== "staff" && (
+        <Card title="Delete event">
+          <p className="text-sm text-muted">
+            Takes the event page offline and closes it for attendees. Restorable for 30 days; after that the
+            event, its attendees, messages and images are permanently deleted.
+          </p>
+          <DeleteEventButton eventId={eventId} orgId={event.org_id} name={event.name} />
         </Card>
       )}
     </main>

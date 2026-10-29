@@ -8,7 +8,7 @@ import { getAttendance } from "@/lib/attendance";
 
 export const metadata: Metadata = { title: "Inbox", robots: { index: false } };
 
-const READ_ONLY_LABEL: Record<string, string> = { blocked: "Blocked", left: "Left the event", event_closed: "Event ended" };
+const READ_ONLY_LABEL: Record<string, string> = { blocked: "Blocked", left: "Left the event", event_closed: "Event ended", account_deleted: "Account deleted" };
 
 export default async function InboxPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

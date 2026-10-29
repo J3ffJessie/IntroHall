@@ -56,3 +56,25 @@ export async function createEvent(orgId: string, _prev: FormState, form: FormDat
   if (error) return fail(friendlyDbError(error));
   redirect(`/dashboard/events/${data.id}`);
 }
+
+export async function restoreEvent(orgId: string, eventId: string): Promise<string | null> {
+  const { supabase } = await requireUser(`/dashboard/orgs/${orgId}`);
+  const { error } = await supabase.rpc("restore_event", { p_event_id: eventId });
+  if (error) return friendlyDbError(error);
+  const { data: ev } = await supabase.from("events").select("slug").eq("id", eventId).maybeSingle();
+  if (ev) revalidatePath(`/e/${ev.slug}`);
+  revalidatePath(`/dashboard/orgs/${orgId}`);
+  return null;
+}
+
+/** Owners only; the typed name must match. Every event goes with it (purged after 30 days). */
+export async function deleteOrganization(orgId: string, orgName: string, _prev: FormState, form: FormData): Promise<FormState> {
+  if (String(form.get("confirm") ?? "").trim() !== orgName) return fail("Type the organization name exactly to confirm");
+  const { supabase } = await requireUser(`/dashboard/orgs/${orgId}`);
+  const { data: events } = await supabase.from("events").select("slug").eq("org_id", orgId);
+  const { error } = await supabase.rpc("delete_organization", { p_org_id: orgId });
+  if (error) return fail(friendlyDbError(error));
+  for (const e of events ?? []) revalidatePath(`/e/${e.slug}`);
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
+}

@@ -32,7 +32,7 @@ export function decideRoute(
     case "root": {
       const m = pathname.match(/^\/e\/([^/]+)(\/.*)?$/);
       if (m) return { action: "redirect", url: `${protocol}://${m[1]}.${rootDomain}${m[2] ?? "/"}`, status: 308 };
-      if (pathname.startsWith("/dashboard") || pathname.startsWith("/profile")) {
+      if (["/dashboard", "/profile", "/admin"].some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
         return { action: "redirect", url: `${protocol}://app.${rootDomain}${pathname}`, status: 307 };
       }
       return { action: "next" };

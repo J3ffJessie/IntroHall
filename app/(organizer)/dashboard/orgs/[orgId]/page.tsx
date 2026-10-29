@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth/require-user";
 import { formatEventRange } from "@/lib/time";
 import { InviteForm } from "./invite-form";
 import { RemoveMemberButton, RevokeInviteButton } from "./member-buttons";
+import { DeleteOrgForm, RestoreEventButton } from "./org-danger";
 
 export const metadata: Metadata = { title: "Organization" };
 
@@ -26,6 +27,8 @@ export default async function OrgPage({ params }: { params: Promise<{ orgId: str
 
   const myRole = members?.find((m) => m.user_id === user.id)?.role;
   const isAdmin = myRole === "owner" || myRole === "admin";
+  const { data: deleted } = isAdmin ? await supabase.rpc("get_deleted_events", { p_org_id: orgId }) : { data: [] };
+  const dateFmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
     <main className="flex flex-col gap-6">
@@ -84,6 +87,28 @@ export default async function OrgPage({ params }: { params: Promise<{ orgId: str
           </>
         )}
       </Card>
+
+      {isAdmin && deleted && deleted.length > 0 && (
+        <Card title="Recently deleted">
+          <ul className="divide-y divide-border">
+            {deleted.map((e) => (
+              <li key={e.event_id} className="flex items-center justify-between gap-2 py-2">
+                <span>
+                  {e.name}
+                  <span className="ml-2 text-sm text-muted">permanently deleted {dateFmt.format(new Date(e.purge_after))}</span>
+                </span>
+                <RestoreEventButton orgId={orgId} eventId={e.event_id} name={e.name} />
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {myRole === "owner" && (
+        <Card title="Delete organization">
+          <DeleteOrgForm orgId={orgId} name={org.name} />
+        </Card>
+      )}
     </main>
   );
 }

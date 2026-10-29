@@ -17,7 +17,7 @@
     "db:types": "supabase gen types typescript --local --schema public > lib/supabase/types.ts && prettier --write lib/supabase/types.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "seed:attendees": "node scripts/seed-attendees.mts",
-    "test:push": "cd supabase/functions && deno check send-push/index.ts && deno test -A send-push/",
+    "test:functions": "cd supabase/functions && deno check */index.ts && deno test -A",
     "dev:https": "NODE_OPTIONS=--use-system-ca NEXT_PUBLIC_DEV_HTTPS=1 next dev --turbopack -H 0.0.0.0 --experimental-https --experimental-https-key certs/localtest-key.pem --experimental-https-cert certs/localtest.pem",
     "test:e2e:https": "E2E_HTTPS=1 playwright test e2e/pwa.spec.ts e2e/announcements.spec.ts"
   },
@@ -25,6 +25,7 @@
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "next": "15.5.28",
+    "posthog-js": "^1.442.0",
     "qrcode": "^1.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
