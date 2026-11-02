@@ -12,3 +12,7 @@ export function createPublicClient() {
 export function publicAssetUrl(path: string): string {
   return `${SUPABASE_URL}/storage/v1/object/public/event-assets/${path}`;
 }
+
+export function avatarUrl(path: string): string {
+  return `${SUPABASE_URL}/storage/v1/object/public/avatars/${path}`;
+}

@@ -40,6 +40,11 @@ pnpm dev:https                         # https://app.localtest.me:3000, https://
 pnpm exec supabase functions serve     # Edge Functions (send-push, delete-account, purge-events) with hot reload + logs
 ```
 
+To try it on a phone on the same Wi-Fi, stop any other dev server and run `pnpm dev:phone`. It serves
+`http://app.<lan-ip>.sslip.io:3000` (plain HTTP, so no push or offline). One time: open ports 3000 and 54321 to the
+LAN (`sudo ufw allow from 192.168.40.0/24 to any port 3000,54321 proto tcp`). On iOS, turn off Limit IP Address
+Tracking for that Wi-Fi: iCloud Private Relay won't resolve names that point at a LAN address.
+
 Push pipeline: triggers queue jobs in pgmq → `pg_cron` (every 10 s) → `pg_net` → `send-push` Edge Function →
 Web Push. Local worker URL and service key are set by `supabase/seed.sql`; VAPID keys live in `supabase/.env`
 (public key also in `.env.local` as `NEXT_PUBLIC_VAPID_PUBLIC_KEY`). Production: see the launch checklist, step 3.

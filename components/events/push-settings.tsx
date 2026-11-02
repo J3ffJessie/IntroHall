@@ -8,7 +8,7 @@ const DISMISS_KEY = "introhall-push-prompt-dismissed";
 
 function IosInstructions() {
   return (
-    <ol className="ml-5 list-decimal text-sm text-muted">
+    <ol className="ml-5 list-decimal text-sm text-muted-foreground">
       <li>Tap the <strong>Share</strong> button in Safari.</li>
       <li>Choose <strong>Add to Home Screen</strong>.</li>
       <li>Open the event from your Home Screen and turn on notifications there.</li>
@@ -41,27 +41,27 @@ export function PushSettings({ eventId }: { eventId: string }) {
     <Card title="Notifications">
       {state === "on" && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted">On for this device: new requests, accepted requests, messages and announcements.</p>
+          <p className="text-sm text-muted-foreground">On for this device: new requests, accepted requests, messages and announcements.</p>
           <Button variant="secondary" disabled={busy} onClick={disable}>Turn off</Button>
         </div>
       )}
       {state === "off" && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted">Get a notification when someone wants to meet or messages you.</p>
+          <p className="text-sm text-muted-foreground">Get a notification when someone wants to meet or messages you.</p>
           <Button disabled={busy} onClick={enable}>Turn on</Button>
         </div>
       )}
       {state === "denied" && (
-        <p className="text-sm text-muted">Notifications are blocked for this site. Allow them in your browser&apos;s site settings, then come back.</p>
+        <p className="text-sm text-muted-foreground">Notifications are blocked for this site. Allow them in your browser&apos;s site settings, then come back.</p>
       )}
       {state === "ios-install" && (
         <>
-          <p className="text-sm text-muted">On iPhone and iPad, notifications work once the event is on your Home Screen:</p>
+          <p className="text-sm text-muted-foreground">On iPhone and iPad, notifications work once the event is on your Home Screen:</p>
           <IosInstructions />
         </>
       )}
       {state === "unsupported" && (
-        <p className="text-sm text-muted">This browser doesn&apos;t support notifications. Your inbox still updates while the app is open.</p>
+        <p className="text-sm text-muted-foreground">This browser doesn&apos;t support notifications. Your inbox still updates while the app is open.</p>
       )}
       {error && <p role="alert" className="text-sm text-danger">{error}</p>}
     </Card>
@@ -84,7 +84,7 @@ export function PushPrompt({ eventId }: { eventId: string }) {
     <aside aria-label="Notifications" className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary-soft/50 p-4">
       <p className="font-medium text-fg">Don&apos;t miss a connection</p>
       {state === "off" ? (
-        <p className="text-sm text-muted">Turn on notifications to hear about new requests and messages, even when the app is closed.</p>
+        <p className="text-sm text-muted-foreground">Turn on notifications to hear about new requests and messages, even when the app is closed.</p>
       ) : (
         <IosInstructions />
       )}

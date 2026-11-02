@@ -14,7 +14,7 @@ export default async function AnalyticsPage({ params }: { params: Promise<{ even
   if (error) throw new Error(error.message);
   return (
     <main className="flex flex-col gap-2">
-      <p className="text-sm text-muted">Hours and days are in the event&apos;s time zone. Totals only; no one&apos;s activity is tracked individually.</p>
+      <p className="text-sm text-muted-foreground">Hours and days are in the event&apos;s time zone. Totals only; no one&apos;s activity is tracked individually.</p>
       <AnalyticsView data={parseAnalytics(data)} />
     </main>
   );

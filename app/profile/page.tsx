@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buttonClass, Card } from "@/components/ui";
+import { AvatarUploader } from "@/components/avatar-uploader";
 import { requireUser } from "@/lib/auth/require-user";
 import { DeleteAccountForm } from "./account-controls";
 import { ProfileForm } from "./profile-form";
@@ -10,14 +11,17 @@ export const metadata: Metadata = { title: "Your profile" };
 export default async function ProfilePage() {
   const { supabase, user } = await requireUser("/profile");
   const [{ data: account }, { data: blockers }] = await Promise.all([
-    supabase.from("accounts").select("full_name, headline, company, links").eq("user_id", user.id).single(),
+    supabase.from("accounts").select("full_name, headline, company, links, avatar_path").eq("user_id", user.id).single(),
     supabase.rpc("account_deletion_blockers"),
   ]);
 
   return (
     <main className="flex max-w-md flex-col gap-6">
       <h1 className="text-2xl font-semibold">Your profile</h1>
-      <p className="text-sm text-muted">Signed in as {user.email}</p>
+      <p className="text-sm text-muted-foreground">Signed in as {user.email}</p>
+      <Card title="Photo">
+        <AvatarUploader userId={user.id} name={account?.full_name ?? ""} path={account?.avatar_path ?? null} />
+      </Card>
       <ProfileForm
         initial={{
           full_name: account?.full_name ?? "",
@@ -28,7 +32,7 @@ export default async function ProfilePage() {
       />
 
       <Card title="Your data">
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Download everything IntroHall holds about you: profile, events joined, interests, connection requests,
           messages you sent, notification devices, blocks and reports you filed.
         </p>
@@ -37,7 +41,7 @@ export default async function ProfilePage() {
       </Card>
 
       <Card title="Delete account">
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Removes your profile from every event, your interests, requests, blocks and notification devices, and your
           sign-in. People you messaged keep the conversation, shown as from “Deleted user”, until the event&apos;s
           message retention ends. This can&apos;t be undone.

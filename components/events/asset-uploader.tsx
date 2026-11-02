@@ -60,7 +60,7 @@ export function AssetUploader({ eventId, orgId, kind, asset, hint, disabled }:
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-muted">{hint}</p>
+      <p className="text-sm text-muted-foreground">{hint}</p>
       {asset && kind === "banner" ? (
         // Exactly how the event page frames it.
         <BannerFrame src={asset.url} alt={asset.alt || "Current banner image"} width={asset.width} height={asset.height}
@@ -72,7 +72,7 @@ export function AssetUploader({ eventId, orgId, kind, asset, hint, disabled }:
              className="h-auto max-h-80 w-full rounded-lg border border-border bg-surface-muted object-contain" />
       ) : (
         <div className={`${ASPECT[kind]} grid w-full place-items-center rounded-lg border border-dashed border-border-strong
-                         bg-surface-muted text-sm text-muted`}>
+                         bg-surface-muted text-sm text-muted-foreground`}>
           No image yet
         </div>
       )}
@@ -81,7 +81,7 @@ export function AssetUploader({ eventId, orgId, kind, asset, hint, disabled }:
           <label htmlFor={inputId} className="flex flex-col gap-1.5 text-sm font-medium">
             File
             <input id={inputId} ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp"
-                   className="text-sm font-normal text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-primary-soft file:px-3 file:py-2 file:font-medium file:text-primary-soft-fg" />
+                   className="text-sm font-normal text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-primary-soft file:px-3 file:py-2 file:font-medium file:text-primary-soft-fg" />
           </label>
           <label htmlFor={`${inputId}-alt`} className="flex flex-1 flex-col gap-1.5 text-sm font-medium">
             Description (alt text)

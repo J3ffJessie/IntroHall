@@ -23,7 +23,7 @@ export function DeleteOrgForm({ orgId, name }: { orgId: string; name: string }) 
   const [state, onSubmit, pending] = useFormAction(deleteOrganization.bind(null, orgId, name));
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-2">
-      <p className="text-sm text-muted">
+      <p className="text-sm text-muted-foreground">
         Deletes the organization and all of its events. Their pages go offline immediately and everything is
         permanently removed after 30 days. Team members lose access.
       </p>

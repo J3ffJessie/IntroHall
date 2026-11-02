@@ -19,7 +19,7 @@ export default async function TagsPage({ params }: { params: Promise<{ eventId: 
   return (
     <main>
       <Card title="Interests">
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Attendees pick from these when they join. Hidden interests disappear from pickers, profiles and match scores. Merge duplicates
           (like “JS” and “JavaScript”) to move everyone onto one interest.
         </p>

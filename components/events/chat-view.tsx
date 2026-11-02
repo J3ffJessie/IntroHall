@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { blockAttendee } from "@/app/e/[slug]/actions";
+import { HandWaving } from "@phosphor-icons/react";
+import { Avatar } from "@/components/avatar";
+import { useConfirm } from "@/components/confirm";
 import { Button, inputClass } from "@/components/ui";
 import { enqueue, flush, list, type OutboxItem, type SendResult } from "@/lib/outbox/outbox";
 import { useChannel } from "@/lib/realtime/use-channel";
@@ -18,7 +21,7 @@ type Props = {
   conversationId: string;
   userId: string;
   me: string;
-  partner: { id: string | null; name: string; headline: string };
+  partner: { id: string | null; name: string; headline: string; avatarPath: string | null };
   readOnlyReason: string | null;
   initialMessages: Message[];
   timeZone: string;
@@ -48,6 +51,7 @@ export function ChatView({ slug, conversationId, userId, me, partner, readOnlyRe
   const [hasOlder, setHasOlder] = useState(initialMessages.length === PAGE);
   const [online, setOnline] = useState(true);
   const [blocking, startBlock] = useTransition();
+  const [ask, dialog] = useConfirm();
   const bottom = useRef<HTMLDivElement>(null);
   const time = useMemo(() => new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", minute: "2-digit" }), [timeZone]);
 
@@ -171,8 +175,9 @@ export function ChatView({ slug, conversationId, userId, me, partner, readOnlyRe
     setHasOlder((data ?? []).length === PAGE);
   };
 
-  const block = () => {
-    if (!partner.id || !confirm(`Block ${partner.name}? You won't see each other and this chat closes.`)) return;
+  const block = async () => {
+    if (!partner.id || !await ask({ title: `Block ${partner.name}?`, description: "You won't see each other and this chat closes.",
+                                    action: "Block" })) return;
     startBlock(async () => { await blockAttendee(slug, partner.id!); router.refresh(); });
   };
 
@@ -181,14 +186,20 @@ export function ChatView({ slug, conversationId, userId, me, partner, readOnlyRe
 
   return (
     <div className="flex flex-col gap-4">
+      {dialog}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Link href="/inbox" className="text-sm text-muted hover:text-fg">← Inbox</Link>
-          <h1 className="truncate text-xl font-semibold">{partner.name}</h1>
-          {partner.headline && <p className="truncate text-sm text-muted">{partner.headline}</p>}
+          <Link href="/inbox" className="text-sm text-muted-foreground hover:text-fg">← Inbox</Link>
+          <div className="mt-1 flex items-center gap-3">
+            <Avatar name={partner.name} path={partner.avatarPath} />
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-semibold">{partner.name}</h1>
+              {partner.headline && <p className="truncate text-sm text-muted-foreground">{partner.headline}</p>}
+            </div>
+          </div>
         </div>
         {partner.id && !readOnlyReason && (
-          <div className="flex shrink-0 gap-3 pt-6 text-sm">
+          <div className="flex shrink-0 gap-3 pt-9 text-sm">
             <ReportDialog slug={slug} attendeeId={partner.id} name={partner.name} label="Report" />
             <button type="button" disabled={blocking} onClick={block} className="text-danger underline">Block</button>
           </div>
@@ -208,21 +219,24 @@ export function ChatView({ slug, conversationId, userId, me, partner, readOnlyRe
           </li>
         )}
         {messages.length === 0 && pending.length === 0 && (
-          <li className="py-8 text-center text-muted">You&apos;re connected. Say hello!</li>
+          <li className="flex flex-col items-center gap-2 py-10 text-center text-muted-foreground">
+            <HandWaving weight="duotone" aria-hidden className="size-10 text-primary" />
+            You&apos;re connected. Say hello!
+          </li>
         )}
         {messages.map((m) => {
           const mine = m.sender_attendee === me;
           return (
             <li key={m.id} className={`group flex flex-col ${mine ? "items-end" : "items-start"}`}>
               <div className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 ${
-                mine ? "rounded-br-md bg-primary text-primary-fg" : "rounded-bl-md bg-surface text-fg ring-1 ring-border"}`}>
+                mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-surface text-fg ring-1 ring-border"}`}>
                 {m.body}
               </div>
-              <span className="mt-0.5 flex gap-2 px-1 text-xs text-muted">
+              <span className="mt-0.5 flex gap-2 px-1 text-xs text-muted-foreground">
                 {time.format(new Date(m.created_at))}
                 {!mine && partner.id && m.sender_attendee && (
                   <ReportDialog slug={slug} attendeeId={partner.id} name={partner.name} messageId={m.id}
-                                messagePreview={m.body} label="Report" className="text-xs text-muted underline hover:text-fg" />
+                                messagePreview={m.body} label="Report" className="text-xs text-muted-foreground underline hover:text-fg" />
                 )}
               </span>
             </li>
@@ -230,10 +244,10 @@ export function ChatView({ slug, conversationId, userId, me, partner, readOnlyRe
         })}
         {pending.map((p) => (
           <li key={p.client_msg_id} className="flex flex-col items-end">
-            <div className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-primary/60 px-3.5 py-2 text-primary-fg">
+            <div className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-primary/60 px-3.5 py-2 text-primary-foreground">
               {p.body}
             </div>
-            <span className={`mt-0.5 px-1 text-xs ${p.error ? "text-danger" : "text-muted"}`}>
+            <span className={`mt-0.5 px-1 text-xs ${p.error ? "text-danger" : "text-muted-foreground"}`}>
               {p.error ? `Not sent: ${p.error}` : "Sending…"}
             </span>
           </li>
@@ -242,7 +256,7 @@ export function ChatView({ slug, conversationId, userId, me, partner, readOnlyRe
       <div ref={bottom} />
 
       {readOnlyReason ? (
-        <p className="rounded-lg bg-surface-muted px-3 py-2 text-sm text-muted">{READ_ONLY_TEXT[readOnlyReason] ?? "This conversation is read-only."}</p>
+        <p className="rounded-lg bg-surface-muted px-3 py-2 text-sm text-muted-foreground">{READ_ONLY_TEXT[readOnlyReason] ?? "This conversation is read-only."}</p>
       ) : (
         <form onSubmit={send} className="sticky bottom-0 -mx-4 flex items-end gap-2 border-t border-border bg-canvas/95 px-4 py-3 backdrop-blur">
           <label htmlFor="composer" className="sr-only">Message {partner.name}</label>

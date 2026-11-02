@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const supabase = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54321");
 
 const nextConfig: NextConfig = {
-  // Dev server is reached via app./{slug}.localtest.me subdomains.
-  allowedDevOrigins: ["*.localtest.me", "localtest.me"],
+  // Dev server is reached via app./{slug}.localtest.me subdomains (or *.sslip.io from a phone).
+  allowedDevOrigins: ["*.localtest.me", "localtest.me", "**.sslip.io"],
   images: {
     remotePatterns: [
       {

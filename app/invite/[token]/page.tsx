@@ -23,7 +23,7 @@ export default async function InvitePage({ params, searchParams }:
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-4 px-4">
       <h1 className="text-2xl font-semibold">You&apos;ve been invited</h1>
-      <p className="text-muted">
+      <p className="text-muted-foreground">
         Accept to join the organization as <strong>{user.email}</strong>. The invite must have been sent to this address.
       </p>
       {error && <p role="alert" className="text-sm text-danger">{error}</p>}

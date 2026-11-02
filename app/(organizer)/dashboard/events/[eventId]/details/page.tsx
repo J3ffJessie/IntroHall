@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Event details" };
 export default async function EventDetailsPage({ params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
   const { event } = await getOrgEvent(eventId);
-  if (event.status === "archived") return <p className="text-muted">Archived events are read-only.</p>;
+  if (event.status === "archived") return <p className="text-muted-foreground">Archived events are read-only.</p>;
 
   return (
     <main className="max-w-xl">

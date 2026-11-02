@@ -1,6 +1,6 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { Pool } from "pg";
-import { expectNoSeriousA11yViolations, latestOtp } from "./helpers";
+import { confirmDialog, expectNoSeriousA11yViolations, latestOtp } from "./helpers";
 import { seedConversation, seedEvent, userIdByEmail } from "./seed";
 
 const ROOT = "localtest.me:3000";
@@ -106,8 +106,8 @@ test("connect, chat in realtime, survive offline, report and block", async ({ br
   await expect(org.getByText("Nothing to review.")).toBeVisible();
 
   // Ben blocks Ann: the chat is read-only on both sides and Ann disappears from Ben's matches.
-  ben.page.once("dialog", (d) => d.accept());
   await ben.page.getByRole("button", { name: "Block" }).click();
+  await confirmDialog(ben.page, "Block");
   await expect(ben.page.getByText("closed because one of you blocked the other")).toBeVisible();
   await ann.page.reload();
   await expect(ann.page.getByText("closed because one of you blocked the other")).toBeVisible();

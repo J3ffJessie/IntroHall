@@ -63,12 +63,12 @@ export function LoginForm({ next }: { next: string }) {
           <input id="code" inputMode="numeric" autoComplete="one-time-code" required value={code}
                  onChange={(e) => setCode(e.target.value)} className={input} />
           <button type="submit" disabled={busy || !hydrated} className={button}>Verify</button>
-          <button type="button" onClick={() => setStep("email")} className="text-sm text-muted underline hover:text-fg">
+          <button type="button" onClick={() => setStep("email")} className="text-sm text-muted-foreground underline hover:text-fg">
             Use a different email
           </button>
         </form>
       )}
-      <div className="text-center text-sm text-muted">or</div>
+      <div className="text-center text-sm text-muted-foreground">or</div>
       <button type="button" onClick={google} disabled={!hydrated} className={`${buttonClass.secondary} w-full`}>
         Continue with Google
       </button>

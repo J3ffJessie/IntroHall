@@ -37,10 +37,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               <li key={o.org_id} className="flex items-center justify-between gap-3 py-2">
                 <span className="min-w-0">
                   <span className="font-medium">{o.name}</span>
-                  <span className="ml-2 text-sm text-muted">{o.slug}</span>
+                  <span className="ml-2 text-sm text-muted-foreground">{o.slug}</span>
                   {o.suspended_at && <span className="ml-2 rounded-full bg-danger-soft px-2 py-0.5 text-xs text-danger">Suspended</span>}
-                  {o.deleted_at && <span className="ml-2 rounded-full bg-surface-muted px-2 py-0.5 text-xs text-muted">Deleted</span>}
-                  <span className="block text-sm text-muted">
+                  {o.deleted_at && <span className="ml-2 rounded-full bg-surface-muted px-2 py-0.5 text-xs text-muted-foreground">Deleted</span>}
+                  <span className="block text-sm text-muted-foreground">
                     {o.events} events · {o.members} members · owner {o.owners?.join(", ") || "none"} · created {dateFmt.format(new Date(o.created_at))}
                   </span>
                 </span>
@@ -49,7 +49,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             ))}
           </ul>
         ) : (
-          <p className="text-muted">No organizations found.</p>
+          <p className="text-muted-foreground">No organizations found.</p>
         )}
       </Card>
 
@@ -67,7 +67,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 <span className="min-w-0">
                   <span className="font-medium">{u.email}</span>
                   {u.suspended && <span className="ml-2 rounded-full bg-danger-soft px-2 py-0.5 text-xs text-danger">Suspended</span>}
-                  <span className="block text-sm text-muted">
+                  <span className="block text-sm text-muted-foreground">
                     {u.full_name || "No name"} · {u.events} events · joined {dateFmt.format(new Date(u.created_at))}
                   </span>
                 </span>
@@ -76,9 +76,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             ))}
           </ul>
         ) : (
-          <p className="text-muted">No one found.</p>
+          <p className="text-muted-foreground">No one found.</p>
         )}
-        <p className="text-xs text-muted">
+        <p className="text-xs text-muted-foreground">
           Unsuspending restores sign-in only. Event bans from the suspension stay until each event&apos;s organizers lift them.
         </p>
       </Card>

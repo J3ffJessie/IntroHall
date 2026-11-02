@@ -13,7 +13,7 @@ export function AnnouncementList({ items, timeZone }: { items: Announcement[]; t
         <li key={a.id} className={`rounded-xl border p-4 ${a.pinned ? "border-primary/40 bg-primary-soft/40" : "border-border bg-surface"}`}>
           <p className="font-semibold">{a.pinned && <span aria-label="Pinned">📌 </span>}{a.title}</p>
           {a.body && <p className="mt-1 whitespace-pre-line text-sm">{a.body}</p>}
-          {a.published_at && <p className="mt-2 text-xs text-muted">{fmt.format(new Date(a.published_at))}</p>}
+          {a.published_at && <p className="mt-2 text-xs text-muted-foreground">{fmt.format(new Date(a.published_at))}</p>}
         </li>
       ))}
     </ul>

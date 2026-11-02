@@ -11,5 +11,5 @@ export function SignOutButton() {
     document.body.append(form);
     form.submit();
   };
-  return <button type="button" onClick={signOut} className="text-sm text-muted underline hover:text-fg">Sign out</button>;
+  return <button type="button" onClick={signOut} className="text-sm text-muted-foreground underline hover:text-fg">Sign out</button>;
 }

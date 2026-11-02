@@ -20,11 +20,11 @@ export default async function ReportsPage({ params }: { params: Promise<{ eventI
       {/* New reports appear live; the poll is a fallback if the socket drops. */}
       <LiveRefresh topic={`moderation:${eventId}`} events={["report"]} pollMs={30_000} />
       <Card title={`Open reports (${open.length})`}>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           You see a copy of the reported message, never the rest of the conversation. Copies are kept until you resolve the report.
         </p>
         {open.length === 0 ? (
-          <p className="text-muted">Nothing to review.</p>
+          <p className="text-muted-foreground">Nothing to review.</p>
         ) : (
           <ul className="flex flex-col gap-4">
             {open.map((r) => {
@@ -35,15 +35,15 @@ export default async function ReportsPage({ params }: { params: Promise<{ eventI
                     <p className="font-semibold">
                       {r.target_name}
                       {r.target_banned && <span className="ml-2 rounded-full bg-danger-soft px-2 py-0.5 text-xs text-danger">Banned</span>}
-                      {!r.target_banned && r.target_left && <span className="ml-2 rounded-full bg-surface-muted px-2 py-0.5 text-xs text-muted">Removed / left</span>}
+                      {!r.target_banned && r.target_left && <span className="ml-2 rounded-full bg-surface-muted px-2 py-0.5 text-xs text-muted-foreground">Removed / left</span>}
                     </p>
-                    <span className="text-xs text-muted">Reported by {r.reporter_name} · {fmt.format(new Date(r.reported_at))}</span>
+                    <span className="text-xs text-muted-foreground">Reported by {r.reporter_name} · {fmt.format(new Date(r.reported_at))}</span>
                   </div>
-                  {(snap.headline || snap.company) && <p className="text-sm text-muted">{[snap.headline, snap.company].filter(Boolean).join(" · ")}</p>}
+                  {(snap.headline || snap.company) && <p className="text-sm text-muted-foreground">{[snap.headline, snap.company].filter(Boolean).join(" · ")}</p>}
                   <p><span className="font-medium">Reason:</span> {r.reason}</p>
                   {r.message_snapshot && (
                     <blockquote className="rounded-lg bg-surface-muted px-3 py-2 text-sm">
-                      <span className="mb-1 block text-xs font-medium text-muted">Reported message</span>
+                      <span className="mb-1 block text-xs font-medium text-muted-foreground">Reported message</span>
                       “{r.message_snapshot}”
                     </blockquote>
                   )}
@@ -61,7 +61,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ eventI
             {resolved.map((r) => (
               <li key={r.report_id} className="py-2">
                 <span className="font-medium">{r.target_name}</span>: {r.reason}
-                <span className="text-muted"> · resolved {r.resolved_at ? fmt.format(new Date(r.resolved_at)) : ""}
+                <span className="text-muted-foreground"> · resolved {r.resolved_at ? fmt.format(new Date(r.resolved_at)) : ""}
                   {r.resolution_note ? ` · “${r.resolution_note}”` : ""}</span>
               </li>
             ))}

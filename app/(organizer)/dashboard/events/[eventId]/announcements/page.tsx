@@ -33,8 +33,8 @@ export default async function AnnouncementsAdminPage({ params }: { params: Promi
           <ul className="flex flex-col divide-y divide-border">
             {scheduled.map((a) => (
               <li key={a.id} className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
-                <p className="font-medium">{a.title}{a.pinned && <span className="ml-2 text-xs text-muted">📌 pinned</span>}</p>
-                <p className="text-sm text-muted">{a.publish_at ? `Posts ${fmt.format(new Date(a.publish_at))}` : "Draft"}</p>
+                <p className="font-medium">{a.title}{a.pinned && <span className="ml-2 text-xs text-muted-foreground">📌 pinned</span>}</p>
+                <p className="text-sm text-muted-foreground">{a.publish_at ? `Posts ${fmt.format(new Date(a.publish_at))}` : "Draft"}</p>
                 <AnnouncementRowActions eventId={eventId} id={a.id} pinned={a.pinned} scheduled />
               </li>
             ))}
@@ -44,14 +44,14 @@ export default async function AnnouncementsAdminPage({ params }: { params: Promi
 
       <Card title={`Posted (${published.length})`}>
         {published.length === 0 ? (
-          <p className="text-muted">Nothing posted yet. Announcements appear on the event page and in attendees&apos; feeds.</p>
+          <p className="text-muted-foreground">Nothing posted yet. Announcements appear on the event page and in attendees&apos; feeds.</p>
         ) : (
           <ul className="flex flex-col divide-y divide-border">
             {published.map((a) => (
               <li key={a.id} className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
                 <p className="font-medium">{a.pinned && <span aria-label="Pinned">📌 </span>}{a.title}</p>
                 {a.body && <p className="whitespace-pre-line text-sm">{a.body}</p>}
-                <p className="text-xs text-muted">{fmt.format(new Date(a.published_at!))}</p>
+                <p className="text-xs text-muted-foreground">{fmt.format(new Date(a.published_at!))}</p>
                 <AnnouncementRowActions eventId={eventId} id={a.id} pinned={a.pinned} />
               </li>
             ))}

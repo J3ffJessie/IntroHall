@@ -20,7 +20,7 @@ export default async function JoinPage({ params, searchParams }:
   if (active) redirect(active.completed_at ? "/home" : "/setup");
 
   const legal = (
-    <p className="text-sm text-muted">
+    <p className="text-sm text-muted-foreground">
       By joining you agree to the <Link href="/legal/terms" className="text-primary underline">Terms</Link> and{" "}
       <Link href="/legal/privacy" className="text-primary underline">Privacy Policy</Link>.
     </p>
@@ -30,15 +30,15 @@ export default async function JoinPage({ params, searchParams }:
     <AttendeeShell eventName={event.name}>
       {event.status === "archived" ? (
         <Card title="This event has ended">
-          <p className="text-muted">Joining is closed.</p>
+          <p className="text-muted-foreground">Joining is closed.</p>
         </Card>
       ) : attendee?.banned_at ? (
         <Card title="You can't join this event">
-          <p className="text-muted">The organizer removed you from this event. Contact them if you think this is a mistake.</p>
+          <p className="text-muted-foreground">The organizer removed you from this event. Contact them if you think this is a mistake.</p>
         </Card>
       ) : !user ? (
         <Card title={`Join ${event.name}`}>
-          <p className="text-muted">Sign in with your email to meet people who share your interests. No password needed.</p>
+          <p className="text-muted-foreground">Sign in with your email to meet people who share your interests. No password needed.</p>
           <LoginForm next={c ? `/join?c=${encodeURIComponent(c)}` : "/join"} />
           {legal}
         </Card>

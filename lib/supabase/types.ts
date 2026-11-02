@@ -1103,6 +1103,7 @@ export type Database = {
       get_connections: {
         Args: { p_event_id: string };
         Returns: {
+          avatar_path: string;
           company: string;
           conversation_id: string;
           created_at: string;
@@ -1118,6 +1119,7 @@ export type Database = {
       get_conversations: {
         Args: { p_event_id: string };
         Returns: {
+          avatar_path: string;
           conversation_id: string;
           full_name: string;
           headline: string;

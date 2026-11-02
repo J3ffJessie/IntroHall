@@ -27,15 +27,15 @@ export function TagManager({ eventId, tags, disabled, merged }:
         </form>
       )}
       {tags.length === 0 ? (
-        <p className="text-muted">No interests yet.</p>
+        <p className="text-muted-foreground">No interests yet.</p>
       ) : (
         <ul className="flex flex-wrap gap-2">
           {tags.map((t) => (
             <li key={t.id}
                 className={`flex items-center gap-2 rounded-full border px-3 py-1 text-sm ${
-                  t.hidden ? "border-dashed border-border-strong text-muted" : "border-border-strong"}`}>
+                  t.hidden ? "border-dashed border-border-strong text-muted-foreground" : "border-border-strong"}`}>
               <span>{t.label}</span>
-              {!t.is_official && <span className="text-xs text-muted">(attendee)</span>}
+              {!t.is_official && <span className="text-xs text-muted-foreground">(attendee)</span>}
               {!disabled && (
                 <button type="button" disabled={toggling} className="text-xs underline"
                         aria-label={`${t.hidden ? "Show" : "Hide"} ${t.label}`}
@@ -67,14 +67,14 @@ export function TagManager({ eventId, tags, disabled, merged }:
             </div>
             <Button type="submit" variant="secondary" disabled={merging}>Merge</Button>
           </div>
-          <p className="text-xs text-muted">This can&apos;t be undone. The first interest disappears; anyone who typed it later gets the second.</p>
+          <p className="text-xs text-muted-foreground">This can&apos;t be undone. The first interest disappears; anyone who typed it later gets the second.</p>
           <FormMessage state={mergeState} />
         </form>
       )}
       {merged.length > 0 && (
         <div className="flex flex-col gap-1 text-sm">
           <h3 className="font-medium">Merged</h3>
-          <ul className="text-muted">
+          <ul className="text-muted-foreground">
             {merged.map((m) => <li key={m.label}>{m.label} → {m.into}</li>)}
           </ul>
         </div>

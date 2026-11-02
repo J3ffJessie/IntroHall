@@ -1,3 +1,5 @@
+import { ChartBar, Tag } from "@phosphor-icons/react/dist/ssr";
+import { NumberTicker } from "@/components/magicui/number-ticker";
 import { Card } from "@/components/ui";
 import { type EventAnalytics, joinBuckets, percent } from "@/lib/analytics";
 
@@ -5,24 +7,25 @@ const fmt = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractio
 
 function StatTile({ label, value, detail }: { label: string; value: number; detail?: string }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-border bg-surface p-4 shadow-sm">
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className="text-2xl font-semibold tabular-nums text-fg">{fmt.format(value)}</dd>
-      {detail && <dd className="text-xs text-muted">{detail}</dd>}
+    <div className="relative flex flex-col gap-1 overflow-hidden rounded-2xl border border-border bg-surface p-4 shadow-sm">
+      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-highlight" />
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd className="font-display text-3xl font-bold tabular-nums text-fg"><NumberTicker value={value} /></dd>
+      {detail && <dd className="text-xs text-muted-foreground">{detail}</dd>}
     </div>
   );
 }
 
 function JoinsChart({ rows }: { rows: EventAnalytics["joins_by_hour"] }) {
   const { unit, buckets } = joinBuckets(rows);
-  if (!buckets.length) return <p className="text-muted">No one has joined yet.</p>;
+  if (!buckets.length) return <p className="text-muted-foreground">No one has joined yet.</p>;
   const max = Math.max(...buckets.map((b) => b.joins));
   const peak = buckets.findIndex((b) => b.joins === max);
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-2">
         {/* Y axis: the peak value and the baseline. */}
-        <div aria-hidden className="flex h-40 flex-col justify-between text-right text-xs tabular-nums text-muted">
+        <div aria-hidden className="flex h-40 flex-col justify-between text-right text-xs tabular-nums text-muted-foreground">
           <span>{fmt.format(max)}</span>
           <span>0</span>
         </div>
@@ -40,12 +43,12 @@ function JoinsChart({ rows }: { rows: EventAnalytics["joins_by_hour"] }) {
           ))}
         </div>
       </div>
-      <div aria-hidden className="ml-8 flex justify-between text-xs text-muted">
+      <div aria-hidden className="ml-8 flex justify-between text-xs text-muted-foreground">
         <span>{buckets[0].label}</span>
         {buckets.length > 1 && <span>{buckets[buckets.length - 1].label}</span>}
       </div>
       <details className="text-sm">
-        <summary className="cursor-pointer text-muted hover:text-fg">Show as table</summary>
+        <summary className="cursor-pointer text-muted-foreground hover:text-fg">Show as table</summary>
         <table className="mt-2 w-full max-w-sm text-left">
           <thead><tr><th className="py-1 font-medium">{unit === "hour" ? "Hour" : "Day"}</th><th className="py-1 text-right font-medium">Joined</th></tr></thead>
           <tbody>
@@ -60,18 +63,18 @@ function JoinsChart({ rows }: { rows: EventAnalytics["joins_by_hour"] }) {
 }
 
 function TopTags({ tags }: { tags: EventAnalytics["top_tags"] }) {
-  if (!tags.length) return <p className="text-muted">No interests picked yet.</p>;
+  if (!tags.length) return <p className="text-muted-foreground">No interests picked yet.</p>;
   const max = Math.max(...tags.map((t) => t.attendees));
   return (
     <ol className="flex flex-col gap-2">
       {tags.map((t) => (
         <li key={t.label} className="grid grid-cols-[minmax(6rem,10rem)_1fr] items-center gap-3 text-sm">
           <span className="truncate" title={t.label}>
-            {t.label}{t.hidden && <span className="text-muted"> (hidden)</span>}
+            {t.label}{t.hidden && <span className="text-muted-foreground"> (hidden)</span>}
           </span>
           <span className="flex items-center gap-2">
             <span className="h-5 max-w-full rounded-r-[4px] bg-chart-1" style={{ width: `${(t.attendees / max) * 85}%` }} />
-            <span className="tabular-nums text-muted">{t.attendees}</span>
+            <span className="tabular-nums text-muted-foreground">{t.attendees}</span>
           </span>
         </li>
       ))}
@@ -94,11 +97,11 @@ export function AnalyticsView({ data }: { data: EventAnalytics }) {
                   detail={acceptedPct === null ? undefined : `${acceptedPct}% of requests`} />
         <StatTile label="Conversations started" value={data.conversations_started} />
       </dl>
-      <Card title="Joins over time">
+      <Card title="Joins over time" icon={<ChartBar weight="duotone" />}>
         <JoinsChart rows={data.joins_by_hour} />
       </Card>
-      <Card title="Top interests">
-        <p className="text-sm text-muted">Among attendees currently in the event. Individual choices are never shown.</p>
+      <Card title="Top interests" icon={<Tag weight="duotone" />}>
+        <p className="text-sm text-muted-foreground">Among attendees currently in the event. Individual choices are never shown.</p>
         <TopTags tags={data.top_tags} />
       </Card>
     </div>

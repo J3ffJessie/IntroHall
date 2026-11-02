@@ -1,26 +1,35 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /*
- * Design tokens. Zinc neutrals + indigo accent; light and dark follow the OS setting.
- * Every text/background pair below meets WCAG AA (≥ 4.5:1) in both modes.
- * Use the semantic utilities (bg-surface, text-muted, border-border, bg-primary …), never raw palette colors.
+ * Design tokens. Warm stone neutrals, a grape-violet brand color and a coral accent; light and dark follow
+ * the OS setting. Every text/background pair below meets WCAG AA (≥ 4.5:1) in both modes.
+ * Use the semantic utilities (bg-surface, text-muted-foreground, border-border, bg-primary …), never raw
+ * palette colors. Names follow shadcn/ui so its components drop in unchanged; to restyle, paste the
+ * :root and dark blocks into tweakcn.com and copy the result back.
  */
 :root {
   color-scheme: light dark;
+  --radius: 0.75rem;
 
-  --canvas: #f7f7f8;
+  --canvas: #faf9f7;
   --surface: #ffffff;
-  --surface-muted: #f4f4f5;
-  --fg: #18181b;
-  --muted: #52525b;
-  --border: #e4e4e7;
-  --border-strong: #d4d4d8;
+  --surface-muted: #f3f1ee;
+  --fg: #1c1917;
+  --muted-foreground: #57534e;
+  --border: #e7e5e4;
+  --border-strong: #d6d3d1;
 
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-fg: #ffffff;
-  --primary-soft: #eef2ff;
-  --primary-soft-fg: #3730a3;
+  --primary: #6d28d9;
+  --primary-hover: #5b21b6;
+  --primary-foreground: #ffffff;
+  --primary-soft: #f3effe;
+  --primary-soft-fg: #5b21b6;
+
+  /* Coral: highlights only (match scores, "new" markers), never the main action. */
+  --highlight: #f97316;
+  --highlight-soft: #fff1eb;
+  --highlight-soft-fg: #9a3412;
 
   --danger: #b91c1c;
   --danger-soft: #fef2f2;
@@ -30,24 +39,28 @@
   --warning-soft: #fffbeb;
 
   /* Single-series chart marks (validated vs the surface in each mode). */
-  --chart-1: #4f46e5;
+  --chart-1: #6d28d9;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --canvas: #09090b;
-    --surface: #18181b;
-    --surface-muted: #27272a;
-    --fg: #fafafa;
-    --muted: #a1a1aa;
-    --border: #27272a;
-    --border-strong: #3f3f46;
+    --canvas: #0c0a09;
+    --surface: #1c1917;
+    --surface-muted: #292524;
+    --fg: #fafaf9;
+    --muted-foreground: #a8a29e;
+    --border: #292524;
+    --border-strong: #44403c;
 
-    --primary: #818cf8;
-    --primary-hover: #a5b4fc;
-    --primary-fg: #0f0d2e;
-    --primary-soft: #1e1b4b;
-    --primary-soft-fg: #c7d2fe;
+    --primary: #a78bfa;
+    --primary-hover: #c4b5fd;
+    --primary-foreground: #1e0b3e;
+    --primary-soft: #2e1065;
+    --primary-soft-fg: #ddd6fe;
+
+    --highlight: #fb923c;
+    --highlight-soft: #3b1a0c;
+    --highlight-soft-fg: #fdba74;
 
     --danger: #f87171;
     --danger-soft: #2c1215;
@@ -56,7 +69,7 @@
     --warning-fg: #fcd34d;
     --warning-soft: #2a1f0a;
 
-    --chart-1: #6366f1;
+    --chart-1: #8b5cf6;
   }
 }
 
@@ -65,14 +78,17 @@
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
   --color-fg: var(--fg);
-  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
-  --color-primary-fg: var(--primary-fg);
+  --color-primary-foreground: var(--primary-foreground);
   --color-primary-soft: var(--primary-soft);
   --color-primary-soft-fg: var(--primary-soft-fg);
+  --color-highlight: var(--highlight);
+  --color-highlight-soft: var(--highlight-soft);
+  --color-highlight-soft-fg: var(--highlight-soft-fg);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-success: var(--success);
@@ -80,13 +96,50 @@
   --color-warning-fg: var(--warning-fg);
   --color-warning-soft: var(--warning-soft);
   --color-chart-1: var(--chart-1);
+
+  /* Aliases shadcn/ui components expect. */
+  --color-background: var(--canvas);
+  --color-foreground: var(--fg);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--fg);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--fg);
+  --color-secondary: var(--surface-muted);
+  --color-secondary-foreground: var(--fg);
+  --color-muted: var(--surface-muted);
+  --color-accent: var(--primary-soft);
+  --color-accent-foreground: var(--primary-soft-fg);
+  --color-destructive: var(--danger);
+  --color-input: var(--border-strong);
+  --color-ring: var(--primary);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
 }
 
 body {
   background: var(--canvas);
   color: var(--fg);
   font-family: var(--font-sans);
+}
+
+/* Headings carry the brand voice. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
 }
 
 @media (prefers-reduced-motion: reduce) {

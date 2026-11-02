@@ -7,7 +7,7 @@ export default function TermsPage() {
   return (
     <article>
       <h1>Terms of Service</h1>
-      <p className="text-sm text-muted">Draft — last updated October 26, 2026</p>
+      <p className="text-sm text-muted-foreground">Draft — last updated October 26, 2026</p>
       <h2>Using IntroHall</h2>
       <p>IntroHall helps conference attendees find and message each other. Be respectful: harassment, spam and
          impersonation are not allowed. Organizers and IntroHall may remove anyone who breaks these rules.</p>

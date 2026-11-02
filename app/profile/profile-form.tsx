@@ -24,7 +24,7 @@ export function ProfileForm({ initial }: { initial: ProfileInput }) {
         <textarea id="links" name="links" rows={3} defaultValue={initial.links.join("\n")} className={input} />
       </Field>
       <button type="submit" disabled={pending}
-              className="rounded-md bg-primary px-4 py-2 font-medium text-primary-fg hover:bg-primary-hover disabled:opacity-50">
+              className="rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-primary-hover disabled:opacity-50">
         {pending ? "Saving…" : "Save"}
       </button>
       {state.message && (
