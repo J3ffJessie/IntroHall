@@ -23,29 +23,3 @@ export function OverlapMark({ className }: { className?: string }) {
     </svg>
   );
 }
-
-type Person = { name: string; tags: string[] };
-
-/** Hero illustration: two attendees as circles, their shared interests in the overlap. */
-export function OverlapVenn({ you, them, shared, className }: { you: Person; them: Person; shared: string[]; className?: string }) {
-  return (
-    <figure className={cn("relative mx-auto aspect-[3/2] w-full max-w-md", className)}>
-      <div className="absolute inset-y-0 left-0 aspect-square rounded-full border-2 border-primary/40 bg-primary/12" />
-      <div className="absolute inset-y-0 right-0 aspect-square rounded-full border-2 border-highlight/50 bg-highlight/12" />
-      <div className="absolute inset-y-0 left-[9%] flex w-[22%] flex-col justify-center gap-1.5">
-        <p className="font-display text-sm font-semibold text-primary">{you.name}</p>
-        {you.tags.map((t) => <span key={t} className="text-xs text-muted-foreground">{t}</span>)}
-      </div>
-      <div className="absolute inset-y-0 right-[9%] flex w-[22%] flex-col items-end justify-center gap-1.5 text-right">
-        <p className="font-display text-sm font-semibold text-highlight-soft-fg">{them.name}</p>
-        {them.tags.map((t) => <span key={t} className="text-xs text-muted-foreground">{t}</span>)}
-      </div>
-      <div className="absolute inset-y-0 left-1/2 flex -translate-x-1/2 flex-col items-center justify-center gap-1.5">
-        {shared.map((t) => (
-          <span key={t} className="rounded-full bg-surface px-2.5 py-1 text-xs font-semibold shadow-sm ring-1 ring-border">{t}</span>
-        ))}
-      </div>
-      <figcaption className="sr-only">{you.name} and {them.name} share {shared.join(" and ")}.</figcaption>
-    </figure>
-  );
-}

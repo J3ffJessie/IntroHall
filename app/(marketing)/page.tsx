@@ -1,7 +1,7 @@
 import { ArrowRight, ChatsCircle, QrCode, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { BrandMark } from "@/components/brand-mark";
 import { ShimmerLink } from "@/components/magicui/shimmer-link";
-import { OverlapVenn } from "@/components/overlap";
+import { OverlapDemo } from "@/components/overlap-demo";
 import { PROTOCOL, ROOT_DOMAIN } from "@/lib/env";
 
 const steps = [
@@ -16,7 +16,7 @@ export default function Home() {
       <div className="flex items-center gap-2 font-display text-lg font-semibold">
         <BrandMark />IntroHall
       </div>
-      <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
+      <div className="grid items-center gap-10 md:grid-cols-2">
         <div className="flex flex-col gap-5">
           <h1 className="text-5xl font-extrabold tracking-tight text-balance sm:text-6xl">
             Find your{" "}
@@ -30,9 +30,7 @@ export default function Home() {
             Organizer sign in <ArrowRight weight="bold" />
           </ShimmerLink>
         </div>
-        <OverlapVenn you={{ name: "You", tags: ["Climate", "Design"] }}
-                     them={{ name: "Priya", tags: ["Startups", "Hiring"] }}
-                     shared={["Rust", "GenAI"]} />
+        <OverlapDemo />
       </div>
       <ol className="grid gap-3 sm:grid-cols-3">
         {steps.map(({ icon: Icon, title, body }, i) => (
