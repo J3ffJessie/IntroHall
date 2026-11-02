@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PNG } from "pngjs";
-import { expectNoSeriousA11yViolations, latestOtp, signInWithOtp } from "./helpers";
+import { confirmDialog, expectNoSeriousA11yViolations, latestOtp, openEventSection, signInWithOtp } from "./helpers";
 
 const ROOT = "localtest.me:3000";
 
@@ -42,7 +42,7 @@ test("organizer creates, brands, publishes an event and gets a QR code", async (
   await expect(page.getByText("Tue, Nov 3, 9:00 AM – Wed, Nov 4, 6:00 PM EST")).toBeVisible();
 
   // Interests
-  await page.getByRole("link", { name: "Interests" }).click();
+  await openEventSection(page, "Interests");
   for (const label of ["AI", "Rust", "Design"]) {
     await page.getByLabel("Add an interest").fill(label);
     await page.getByRole("button", { name: "Add", exact: true }).click();
@@ -53,7 +53,7 @@ test("organizer creates, brands, publishes an event and gets a QR code", async (
   await expect(alert(page)).toContainText("already exists");
 
   // Branding: fixed template, so no color pickers; SVG rejected; banner + share image accepted
-  await page.getByRole("link", { name: "Branding" }).click();
+  await openEventSection(page, "Branding");
   await expect(page.locator('input[type="color"]')).toHaveCount(0);
   await expectNoSeriousA11yViolations(page);
   const banner = page.getByRole("region", { name: "Header banner" });
@@ -71,15 +71,15 @@ test("organizer creates, brands, publishes an event and gets a QR code", async (
   await expect(page.getByRole("img", { name: "Conf preview" })).toBeVisible();
 
   // Publish; slug then locked
-  await page.getByRole("link", { name: "Overview" }).click();
-  page.once("dialog", (d) => d.accept());
+  await openEventSection(page, "Overview");
   await page.getByRole("button", { name: "Publish" }).click();
+  await confirmDialog(page, "Publish");
   await expect(page.getByText("published", { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Details" }).click();
+  await openEventSection(page, "Details");
   await expect(page.getByLabel("Event address")).toHaveAttribute("readonly", "");
 
   // QR (open mode)
-  await page.getByRole("link", { name: "Access & QR" }).click();
+  await openEventSection(page, "Access & QR");
   await expect(page.getByText(`Encodes: http://${slug}.${ROOT}/`)).toBeVisible();
   await expect(page.getByRole("link", { name: "Download PNG (1024 px)" })).toBeVisible();
 

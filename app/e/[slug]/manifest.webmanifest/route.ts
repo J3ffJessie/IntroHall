@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     scope: "/",
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#4f46e5",
+    theme_color: "#6d28d9",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },

@@ -18,7 +18,7 @@ export default async function BrandingPage({ params }: { params: Promise<{ event
 
   return (
     <main className="flex flex-col gap-6">
-      <p className="text-sm text-muted">
+      <p className="text-sm text-muted-foreground">
         Event pages use a clean, accessible template that adapts to light and dark mode. Add images to make it yours.
         PNG, JPEG or WebP, up to 5 MB.
       </p>

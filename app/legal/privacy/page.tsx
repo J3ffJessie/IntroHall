@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   return (
     <article>
       <h1>Privacy Policy</h1>
-      <p className="text-sm text-muted">Draft — last updated October 26, 2026</p>
+      <p className="text-sm text-muted-foreground">Draft — last updated October 26, 2026</p>
 
       <h2>What we collect</h2>
       <ul>

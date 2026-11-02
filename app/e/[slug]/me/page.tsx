@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { Avatar } from "@/components/avatar";
 import { AttendeeShell } from "@/components/events/attendee-shell";
 import { HomeActions } from "@/components/events/home-actions";
 import { PushSettings } from "@/components/events/push-settings";
@@ -22,7 +23,7 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
   if (!active.completed_at) redirect("/setup");
 
   const [{ data: account }, { data: interests }, badge] = await Promise.all([
-    supabase.from("accounts").select("full_name, headline, company").eq("user_id", user.id).single(),
+    supabase.from("accounts").select("full_name, headline, company, avatar_path").eq("user_id", user.id).single(),
     supabase.from("attendee_interests").select("interest_tags(label)").eq("attendee_id", active.id),
     inboxCount(supabase, event.id),
   ]);
@@ -34,7 +35,7 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
     <AttendeeShell eventName={event.name} current="me" inboxCount={badge} userId={user.id}>
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">My profile</h1>
-        <p className="text-muted">{formatEventRange(event.starts_at, event.ends_at, event.timezone)}</p>
+        <p className="text-muted-foreground">{formatEventRange(event.starts_at, event.ends_at, event.timezone)}</p>
       </div>
 
       {hidden && (
@@ -45,11 +46,14 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
 
       <Card title="Your profile"
             action={!archived && <Link href="/setup" className="text-sm text-primary underline">Edit</Link>}>
-        <div>
-          <p className="font-medium">{account?.full_name}</p>
-          {(account?.headline || account?.company) && (
-            <p className="text-sm text-muted">{[account?.headline, account?.company].filter(Boolean).join(" · ")}</p>
-          )}
+        <div className="flex items-center gap-3">
+          <Avatar name={account?.full_name ?? ""} path={account?.avatar_path} />
+          <div className="min-w-0">
+            <p className="font-medium">{account?.full_name}</p>
+            {(account?.headline || account?.company) && (
+              <p className="text-sm text-muted-foreground">{[account?.headline, account?.company].filter(Boolean).join(" · ")}</p>
+            )}
+          </div>
         </div>
         {active.bio && <p className="whitespace-pre-line">{active.bio}</p>}
         {active.looking_for && <p><span className="font-medium">Looking for:</span> {active.looking_for}</p>}
@@ -62,7 +66,7 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
 
       {!archived && <PushSettings eventId={event.id} />}
       {!archived && <HomeActions slug={slug} hidden={hidden} eventName={event.name} />}
-      <p className="text-sm text-muted">
+      <p className="text-sm text-muted-foreground">
         Download your data or delete your account in{" "}
         <a href={`${PROTOCOL}://app.${ROOT_DOMAIN}/profile`} className="text-primary underline">your IntroHall account</a>.
       </p>

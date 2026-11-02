@@ -57,7 +57,7 @@ export function EventProfileForm({ action, initial, tags, allowCustom, maxCustom
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       <Card title="Interests">
-        <p className="text-sm text-muted" aria-live="polite">{total} of {MAX_INTERESTS} selected</p>
+        <p className="text-sm text-muted-foreground" aria-live="polite">{total} of {MAX_INTERESTS} selected</p>
         <ul className="flex flex-wrap gap-2">
           {tags.map((t) => {
             const on = selected.has(t.id);
@@ -65,7 +65,7 @@ export function EventProfileForm({ action, initial, tags, allowCustom, maxCustom
               <li key={t.id}>
                 <button type="button" aria-pressed={on} onClick={() => toggle(t.id)}
                         className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                          on ? "border-primary bg-primary text-primary-fg"
+                          on ? "border-primary bg-primary text-primary-foreground"
                              : "border-border-strong bg-surface text-fg hover:border-primary"}`}>
                   {on && <span aria-hidden>✓ </span>}{t.label}
                 </button>
@@ -76,7 +76,7 @@ export function EventProfileForm({ action, initial, tags, allowCustom, maxCustom
             <li key={c}>
               <button type="button" aria-pressed onClick={() => setCustom(custom.filter((x) => x !== c))}
                       aria-label={`Remove ${c}`}
-                      className="rounded-full border border-primary bg-primary px-3 py-1.5 text-sm font-medium text-primary-fg">
+                      className="rounded-full border border-primary bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground">
                 ✓ {c} <span aria-hidden>×</span>
               </button>
             </li>

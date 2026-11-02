@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MagnifyingGlass, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AttendeeShell } from "@/components/events/attendee-shell";
@@ -67,7 +68,7 @@ export default async function MatchesPage({ params, searchParams }:
       {topAnnouncements.length > 0 && page === 0 && (
         <section aria-labelledby="latest-announcements" className="flex flex-col gap-2">
           <div className="flex items-baseline justify-between">
-            <h2 id="latest-announcements" className="text-sm font-semibold uppercase tracking-wide text-muted">Announcements</h2>
+            <h2 id="latest-announcements" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Announcements</h2>
             {sortedAnnouncements.length > topAnnouncements.length && (
               <Link href="/announcements" className="text-sm text-primary underline">See all ({sortedAnnouncements.length})</Link>
             )}
@@ -76,19 +77,19 @@ export default async function MatchesPage({ params, searchParams }:
         </section>
       )}
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{tab === "matches" ? "People who share your interests" : "Everyone else"}</h1>
-        <p className="text-muted">
+        <h1 className="text-3xl font-bold tracking-tight">{tab === "matches" ? "People who share your interests" : "Everyone else"}</h1>
+        <p className="text-muted-foreground">
           {tab === "matches"
             ? "Ranked by shared interests. Rarer interests count for more."
             : "Attendees you don't share an interest with yet. Great for serendipity."}
         </p>
       </div>
 
-      <nav aria-label="Lists" className="flex gap-1 rounded-xl bg-surface-muted p-1 text-sm">
+      <nav aria-label="Lists" className="flex gap-1 rounded-2xl bg-surface-muted p-1 text-sm">
         {(["matches", "everyone"] as const).map((t) => (
           <Link key={t} href={href({ tab: t, page: "0" })} aria-current={tab === t ? "page" : undefined}
-                className={`flex-1 rounded-lg px-3 py-2 text-center font-medium ${
-                  tab === t ? "bg-surface text-fg shadow-sm" : "text-muted hover:text-fg"}`}>
+                className={`flex-1 rounded-xl px-3 py-2 text-center font-medium transition ${
+                  tab === t ? "bg-surface text-fg shadow-sm" : "text-muted-foreground hover:text-fg"}`}>
             {t === "matches" ? "Matches" : "Everyone"}
           </Link>
         ))}
@@ -114,18 +115,23 @@ export default async function MatchesPage({ params, searchParams }:
       )}
 
       {rows.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border-strong p-6 text-center text-muted">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border-strong bg-surface/60 p-8 text-center text-muted-foreground">
+          <span aria-hidden className="grid size-14 place-items-center rounded-2xl bg-primary-soft text-primary-soft-fg">
+            {tab === "matches" ? <MagnifyingGlass weight="duotone" className="size-7" /> : <UsersThree weight="duotone" className="size-7" />}
+          </span>
+          <p className="max-w-sm">
           {tab === "matches"
             ? activeTag
               ? `No one with “${activeTag.label}” shares your interests yet.`
               : "No one shares your interests yet. Check back as more people join, or browse Everyone."
             : "No one here yet."}
+          </p>
         </div>
       ) : (
         <ul className="flex flex-col gap-3" aria-label={tab === "matches" ? "Matches" : "Everyone"}>
-          {rows.map((p) => (
+          {rows.map((p, i) => (
             <li key={p.attendee_id}>
-              <MatchCard person={p} slug={slug} connection={conn.get(p.attendee_id) ?? { state: "none" }} />
+              <MatchCard person={p} slug={slug} index={i} connection={conn.get(p.attendee_id) ?? { state: "none" }} />
             </li>
           ))}
         </ul>
@@ -143,5 +149,5 @@ export default async function MatchesPage({ params, searchParams }:
 
 function chip(on: boolean) {
   return `inline-flex whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium ${
-    on ? "border-primary bg-primary text-primary-fg" : "border-border-strong bg-surface text-fg hover:border-primary"}`;
+    on ? "border-primary bg-primary text-primary-foreground" : "border-border-strong bg-surface text-fg hover:border-primary"}`;
 }

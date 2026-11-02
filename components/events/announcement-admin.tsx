@@ -6,6 +6,7 @@ import {
 } from "@/app/(organizer)/dashboard/events/[eventId]/actions";
 import { Button, Field, FormMessage, inputClass } from "@/components/ui";
 import { useFormAction } from "@/lib/use-form-action";
+import { useConfirm } from "@/components/confirm";
 
 export function AnnouncementComposer({ eventId, timeZone, disabled }: { eventId: string; timeZone: string; disabled: boolean }) {
   const [state, onSubmit, pending] = useFormAction(createAnnouncement.bind(null, eventId, timeZone), { resetOnSuccess: true });
@@ -48,16 +49,19 @@ export function AnnouncementRowActions({ eventId, id, pinned, scheduled = false 
   { eventId: string; id: string; pinned: boolean; scheduled?: boolean }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [ask, dialog] = useConfirm();
   return (
     <div className="flex flex-wrap items-center gap-3 text-sm">
+      {dialog}
       {scheduled && (
         <button type="button" disabled={pending} className="text-primary underline"
                 onClick={() => start(async () => setError(await publishAnnouncementNow(eventId, id)))}>Post now</button>
       )}
-      <button type="button" disabled={pending} className="text-muted underline hover:text-fg"
+      <button type="button" disabled={pending} className="text-muted-foreground underline hover:text-fg"
               onClick={() => start(() => setAnnouncementPinned(eventId, id, !pinned))}>{pinned ? "Unpin" : "Pin"}</button>
       <button type="button" disabled={pending} className="text-danger underline"
-              onClick={() => confirm("Delete this announcement?") && start(() => deleteAnnouncement(eventId, id))}>Delete</button>
+              onClick={async () => await ask({ title: "Delete this announcement?", description: "Attendees will no longer see it.", action: "Delete" }) &&
+                start(() => deleteAnnouncement(eventId, id))}>Delete</button>
       {error && <span role="alert" className="text-danger">{error}</span>}
     </div>
   );

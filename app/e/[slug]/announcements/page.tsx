@@ -24,7 +24,7 @@ export default async function AttendeeAnnouncementsPage({ params }: { params: Pr
       <LiveRefresh topic={`event:${event.id}`} events={["announcement"]} />
       <h1 className="text-2xl font-semibold">Announcements</h1>
       {items?.length ? <AnnouncementList items={sortAnnouncements(items)} timeZone={event.timezone} />
-                     : <p className="text-muted">No announcements yet.</p>}
+                     : <p className="text-muted-foreground">No announcements yet.</p>}
     </AttendeeShell>
   );
 }

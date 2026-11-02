@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BrandMark } from "@/components/brand-mark";
 import { safeNext } from "@/lib/auth/safe-next";
 import { LoginForm } from "./login-form";
 
@@ -13,10 +14,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           Your account has been deleted.
         </p>
       )}
+      <div className="mb-6 flex items-center justify-center gap-2 font-display text-lg font-semibold">
+        <BrandMark />IntroHall
+      </div>
       <div className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold">Sign in to IntroHall</h1>
-          <p className="text-sm text-muted">We&apos;ll email you a 6-digit code. No password needed.</p>
+          <p className="text-sm text-muted-foreground">We&apos;ll email you a 6-digit code. No password needed.</p>
         </div>
         <LoginForm next={safeNext(next, "/dashboard")} />
       </div>

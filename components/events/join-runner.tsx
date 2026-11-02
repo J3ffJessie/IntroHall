@@ -48,7 +48,7 @@ export function JoinRunner({ slug, initialCode }: { slug: string; initialCode: s
     void join(initialCode);
   }, [join, initialCode]);
 
-  if (outcome === "joining") return <p role="status" className="text-muted">Joining…</p>;
+  if (outcome === "joining") return <p role="status" className="text-muted-foreground">Joining…</p>;
 
   const needsCode = outcome === "code_required" || outcome === "invalid_code";
   return (

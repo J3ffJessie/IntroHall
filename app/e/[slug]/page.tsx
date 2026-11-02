@@ -46,7 +46,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const archived = event.status === "archived";
 
   return (
-    <div className="min-h-dvh bg-canvas">
+    <div className="min-h-dvh">
       {banner ? (
         // Banner area spans the same column as the content below and is sized from the image.
         <div className="mx-auto max-w-2xl px-4 pt-4 sm:pt-6">
@@ -82,7 +82,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             )}
           </dl>
           {archived ? (
-            <p className="rounded-xl bg-surface-muted px-4 py-3 text-center text-muted">This event has ended.</p>
+            <p className="rounded-xl bg-surface-muted px-4 py-3 text-center text-muted-foreground">This event has ended.</p>
           ) : (
             <Suspense fallback={<Link href="/join" className={joinButtonClass}>Join and meet people</Link>}>
               <JoinButton />
@@ -95,7 +95,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         {event.description && (
           <section aria-labelledby="about" className="flex flex-col gap-2">
             <h2 id="about" className="text-lg font-semibold text-fg">About</h2>
-            <p className="whitespace-pre-line text-muted">{event.description}</p>
+            <p className="whitespace-pre-line text-muted-foreground">{event.description}</p>
           </section>
         )}
 
@@ -111,9 +111,9 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         )}
 
         <footer className="mt-4 flex flex-wrap items-center gap-4 border-t border-border pt-4 text-sm">
-          <Link href="/legal/privacy" className="text-muted underline underline-offset-2 hover:text-fg">Privacy</Link>
-          <Link href="/legal/terms" className="text-muted underline underline-offset-2 hover:text-fg">Terms</Link>
-          <span className="ml-auto text-muted">Powered by IntroHall</span>
+          <Link href="/legal/privacy" className="text-muted-foreground underline underline-offset-2 hover:text-fg">Privacy</Link>
+          <Link href="/legal/terms" className="text-muted-foreground underline underline-offset-2 hover:text-fg">Terms</Link>
+          <span className="ml-auto text-muted-foreground">Powered by IntroHall</span>
         </footer>
       </main>
     </div>

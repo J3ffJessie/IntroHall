@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { expectNoSeriousA11yViolations, latestOtp } from "./helpers";
+import { confirmDialog, expectNoSeriousA11yViolations, latestOtp } from "./helpers";
 import { seedEvent, userIdByEmail } from "./seed";
 
 const ROOT = "localtest.me:3000";
@@ -80,8 +80,8 @@ test("attendee joins, sets up a profile, and the organizer can ban them", async 
   await expect(org.getByText("Ada Attendee")).toBeVisible();
   await expect(org.getByText("Secret bio text")).toHaveCount(0);
   await expectNoSeriousA11yViolations(org);
-  org.once("dialog", (d) => d.accept());
   await org.getByRole("button", { name: "Ban" }).click();
+  await confirmDialog(org, "Ban");
   await expect(org.getByText("Banned", { exact: true })).toBeVisible();
 
   // Banned attendee is bounced and can't rejoin.

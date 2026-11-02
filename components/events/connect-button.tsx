@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { respondToRequest, sendConnectionRequest } from "@/app/e/[slug]/actions";
+import { ChatCircleDots, Check, HandWaving, Hourglass, X } from "@phosphor-icons/react";
+import { toast } from "sonner";
+import { celebrate, originOf } from "@/components/magicui/confetti";
 import { Button, buttonClass, inputClass } from "@/components/ui";
 
 export type Connection =
@@ -25,12 +28,17 @@ export function ConnectButton({ slug, attendeeId, name, connection }:
     const err = await sendConnectionRequest(slug, attendeeId, note.trim());
     if (err) return setError(err);
     setOpen(false);
+    toast.success(`Request sent to ${first}`);
     router.refresh();
   });
-  const respond = (accept: boolean) => start(async () => {
+  const respond = (accept: boolean, el?: Element) => start(async () => {
     if (connection.state !== "incoming") return;
     const res = await respondToRequest(slug, connection.requestId, accept);
     if (res.error) return setError(res.error);
+    if (accept) {
+      celebrate(el && originOf(el));
+      toast.success(`You and ${first} are connected`);
+    }
     if (res.conversationId) router.push(`/chat/${res.conversationId}`);
     else router.refresh();
   });
@@ -39,14 +47,14 @@ export function ConnectButton({ slug, attendeeId, name, connection }:
     <div className="flex flex-col gap-2">
       {connection.state === "connected" ? (
         connection.conversationId
-          ? <Link href={`/chat/${connection.conversationId}`} className={`${buttonClass.primary} w-full sm:w-fit`}>Message {first}</Link>
-          : <p className="text-sm text-muted">Connected</p>
+          ? <Link href={`/chat/${connection.conversationId}`} className={`${buttonClass.primary} w-full sm:w-fit`}><ChatCircleDots weight="bold" />Message {first}</Link>
+          : <p className="text-sm text-muted-foreground">Connected</p>
       ) : connection.state === "outgoing" ? (
-        <p className="text-sm text-muted">Request sent · waiting for {first}</p>
+        <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground"><Hourglass weight="duotone" aria-hidden className="size-4" />Request sent · waiting for {first}</p>
       ) : connection.state === "incoming" ? (
         <div className="flex gap-2">
-          <Button disabled={pending} onClick={() => respond(true)}>Accept</Button>
-          <Button variant="secondary" disabled={pending} onClick={() => respond(false)}>Decline</Button>
+          <Button disabled={pending} onClick={(e) => respond(true, e.currentTarget)}><Check weight="bold" />Accept</Button>
+          <Button variant="secondary" disabled={pending} onClick={() => respond(false)}><X weight="bold" />Decline</Button>
         </div>
       ) : open ? (
         <div className="flex flex-col gap-2">
@@ -60,7 +68,7 @@ export function ConnectButton({ slug, attendeeId, name, connection }:
         </div>
       ) : (
         <Button variant="secondary" className="w-full sm:w-fit" onClick={() => { setOpen(true); setError(null); }}>
-          Connect with {first}
+          <HandWaving weight="duotone" />Connect with {first}
         </Button>
       )}
       {error && <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>}

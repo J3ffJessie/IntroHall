@@ -28,6 +28,11 @@ export async function signInWithOtp(page: Page, email: string) {
   await expect(page).toHaveURL((url) => url.pathname === "/profile");
 }
 
+/** Confirms the styled confirmation dialog (components/confirm.tsx) by its action button. */
+export async function confirmDialog(page: Page, action: string) {
+  await page.getByRole("alertdialog").getByRole("button", { name: action, exact: true }).click();
+}
+
 export async function expectNoSeriousA11yViolations(page: Page) {
   // Without this, axe can sample colors mid-transition (e.g. right after switching color scheme).
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -36,4 +41,16 @@ export async function expectNoSeriousA11yViolations(page: Page) {
   const details = serious.flatMap((v) =>
     v.nodes.map((n) => `${v.id}: ${n.target.join(" ")} — ${n.failureSummary?.split("\n").slice(1).join(" ")}`));
   expect(serious, `${page.url()}\n${details.join("\n")}`).toEqual([]);
+}
+
+/** Goes to an organizer event section via the mobile section menu (or the tab row on wide screens). */
+export async function openEventSection(page: Page, name: string) {
+  const nav = page.getByRole("navigation", { name: "Event sections" });
+  const trigger = nav.getByRole("button", { name: /Section/ });
+  if (await trigger.isVisible()) {
+    await trigger.click();
+    await page.getByRole("menuitem", { name, exact: true }).click();
+  } else {
+    await nav.getByRole("link", { name, exact: true }).click();
+  }
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CalendarDots, ClockCounterClockwise, Trash, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buttonClass, Card, StatusBadge } from "@/components/ui";
@@ -37,30 +38,30 @@ export default async function OrgPage({ params }: { params: Promise<{ orgId: str
         <Link href={`/dashboard/orgs/${orgId}/events/new`} className={buttonClass.primary}>New event</Link>
       </div>
 
-      <Card title="Events">
+      <Card title="Events" icon={<CalendarDots weight="duotone" />}>
         {events?.length ? (
           <ul className="divide-y divide-border">
             {events.map((e) => (
               <li key={e.id} className="py-3">
                 <Link href={`/dashboard/events/${e.id}`} className="font-medium text-fg hover:text-primary">{e.name}</Link>
                 <span className="ml-2"><StatusBadge status={e.status} /></span>
-                <p className="text-sm text-muted">{formatEventRange(e.starts_at, e.ends_at, e.timezone)}</p>
+                <p className="text-sm text-muted-foreground">{formatEventRange(e.starts_at, e.ends_at, e.timezone)}</p>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-muted">No events yet.</p>
+          <p className="text-muted-foreground">No events yet.</p>
         )}
       </Card>
 
-      <Card title="Team">
+      <Card title="Team" icon={<UsersThree weight="duotone" />}>
         <ul className="divide-y divide-border">
           {members?.map((m) => (
             <li key={m.user_id} className="flex items-center justify-between gap-2 py-2">
               <span>
                 {m.accounts?.full_name || "Unnamed member"}
                 {m.user_id === user.id && " (you)"}
-                <span className="ml-2 text-sm text-muted">{m.role}</span>
+                <span className="ml-2 text-sm text-muted-foreground">{m.role}</span>
               </span>
               {(isAdmin || m.user_id === user.id) && m.role !== "owner" && (
                 <RemoveMemberButton orgId={orgId} userId={m.user_id} self={m.user_id === user.id} />
@@ -89,13 +90,13 @@ export default async function OrgPage({ params }: { params: Promise<{ orgId: str
       </Card>
 
       {isAdmin && deleted && deleted.length > 0 && (
-        <Card title="Recently deleted">
+        <Card title="Recently deleted" icon={<ClockCounterClockwise weight="duotone" />}>
           <ul className="divide-y divide-border">
             {deleted.map((e) => (
               <li key={e.event_id} className="flex items-center justify-between gap-2 py-2">
                 <span>
                   {e.name}
-                  <span className="ml-2 text-sm text-muted">permanently deleted {dateFmt.format(new Date(e.purge_after))}</span>
+                  <span className="ml-2 text-sm text-muted-foreground">permanently deleted {dateFmt.format(new Date(e.purge_after))}</span>
                 </span>
                 <RestoreEventButton orgId={orgId} eventId={e.event_id} name={e.name} />
               </li>
@@ -105,7 +106,7 @@ export default async function OrgPage({ params }: { params: Promise<{ orgId: str
       )}
 
       {myRole === "owner" && (
-        <Card title="Delete organization">
+        <Card title="Delete organization" icon={<Trash weight="duotone" />}>
           <DeleteOrgForm orgId={orgId} name={org.name} />
         </Card>
       )}

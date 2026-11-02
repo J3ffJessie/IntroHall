@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { moderateAttendee, resolveReport } from "@/app/(organizer)/dashboard/events/[eventId]/actions";
 import { Button, inputClass } from "@/components/ui";
+import { useConfirm } from "@/components/confirm";
 
 type Props = { eventId: string; reportId: string; attendeeId: string | null; name: string; banned: boolean; left: boolean };
 
@@ -10,11 +11,14 @@ export function ReportActions({ eventId, reportId, attendeeId, name, banned, lef
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
-  const moderate = (action: "remove" | "ban", text: string) => attendeeId && confirm(text) &&
+  const [ask, dialog] = useConfirm();
+  const moderate = async (action: "remove" | "ban", title: string, description: string) => attendeeId &&
+    await ask({ title, description, action: action === "ban" ? "Ban" : "Remove" }) &&
     start(async () => setError(await moderateAttendee(eventId, attendeeId, action)));
 
   return (
     <div className="flex flex-col gap-2">
+      {dialog}
       <label htmlFor={`note-${reportId}`} className="sr-only">Resolution note</label>
       <input id={`note-${reportId}`} value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000}
              placeholder="Note (optional), e.g. “Warned by email”" className={inputClass} />
@@ -24,11 +28,11 @@ export function ReportActions({ eventId, reportId, attendeeId, name, banned, lef
         </Button>
         {attendeeId && !left && (
           <Button variant="secondary" disabled={pending}
-                  onClick={() => moderate("remove", `Remove ${name} from the event? They can rejoin.`)}>Remove</Button>
+                  onClick={() => moderate("remove", `Remove ${name} from the event?`, "They can rejoin.")}>Remove</Button>
         )}
         {attendeeId && !banned && (
           <Button variant="danger" disabled={pending}
-                  onClick={() => moderate("ban", `Remove and ban ${name}? They won't be able to rejoin.`)}>Ban</Button>
+                  onClick={() => moderate("ban", `Remove and ban ${name}?`, "They won't be able to rejoin.")}>Ban</Button>
         )}
       </div>
       {error && <p role="alert" className="text-sm text-danger">{error}</p>}

@@ -9,7 +9,7 @@ export default async function EventLayout({ children, params }: { children: Reac
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href={`/dashboard/orgs/${event.org_id}`} className="text-sm text-muted hover:text-fg">
+        <Link href={`/dashboard/orgs/${event.org_id}`} className="text-sm text-muted-foreground hover:text-fg">
           {event.organizations?.name}
         </Link>
         <h1 className="text-2xl font-semibold">{event.name}</h1>

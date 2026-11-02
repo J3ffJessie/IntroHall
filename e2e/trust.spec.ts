@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
-import { expectNoSeriousA11yViolations, latestOtp, signInWithOtp } from "./helpers";
+import { confirmDialog, expectNoSeriousA11yViolations, latestOtp, signInWithOtp } from "./helpers";
 import { authUserCount, makePlatformAdmin, rebuildStats, seedAttendee, seedEvent, userIdByEmail } from "./seed";
 
 const ROOT = "localtest.me:3000";
@@ -37,8 +37,8 @@ test("organizer sees analytics, merges interests, deletes and restores an event"
   await expect(page.getByRole("region", { name: "Top interests" })).toContainText("JavaScript2");
 
   await page.goto(`/dashboard/events/${eventId}`);
-  page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Delete event" }).click();
+  await confirmDialog(page, "Delete event");
   await expect(page).toHaveURL(/\/dashboard\/orgs\//);
   const deleted = page.getByRole("region", { name: "Recently deleted" });
   await expect(deleted).toContainText("Metrics");
@@ -111,8 +111,8 @@ test("platform admin suspends an organization; others can't see the admin page",
   await page.goto("/admin");
   await page.getByLabel("Search organizations").fill(slug.replace(/^ev-/, "org-"));
   await page.getByRole("search", { name: "Organizations" }).getByRole("button", { name: "Search" }).click();
-  page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: /^Suspend Org / }).click();
+  await confirmDialog(page, "Suspend");
   await expect(page.getByRole("button", { name: /^Unsuspend Org / })).toBeVisible();
   await expectNoSeriousA11yViolations(page);
 

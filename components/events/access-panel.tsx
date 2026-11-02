@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { rotateJoinCode, setJoinMode } from "@/app/(organizer)/dashboard/events/[eventId]/actions";
 import { Button } from "@/components/ui";
+import { useConfirm } from "@/components/confirm";
 import { QrDownload } from "./qr-download";
 import { joinUrl } from "@/lib/qr";
 
@@ -30,8 +31,10 @@ export function AccessPanel({ eventId, slug, joinMode, rootDomain, protocol, dis
       setCode(null);
     });
 
-  const rotate = () => {
-    if (!confirm("Generate a new code? QR codes already printed with the old code will stop working.")) return;
+  const [ask, dialog] = useConfirm();
+  const rotate = async () => {
+    if (!await ask({ title: "Generate a new code?", description: "QR codes already printed with the old code will stop working.",
+                     action: "Generate code" })) return;
     start(async () => {
       const res = await rotateJoinCode(eventId);
       if (res.error) return setError(res.error);
@@ -42,6 +45,7 @@ export function AccessPanel({ eventId, slug, joinMode, rootDomain, protocol, dis
 
   return (
     <div className="flex flex-col gap-4">
+      {dialog}
       <fieldset className="flex flex-col gap-2" disabled={disabled || pending}>
         <legend className="sr-only">Join mode</legend>
         <label className="flex items-start gap-2">
@@ -67,7 +71,7 @@ export function AccessPanel({ eventId, slug, joinMode, rootDomain, protocol, dis
               <QrDownload url={joinUrl(slug, rootDomain, protocol, code)} slug={slug} />
             </>
           ) : (
-            <p className="text-sm text-muted">
+            <p className="text-sm text-muted-foreground">
               Codes are shown once. Generate one to get the QR code; any previous code stops working.
             </p>
           )}

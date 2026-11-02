@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Attendees" };
 
 function statusOf(r: { completed_at: string | null; left_at: string | null; banned_at: string | null }) {
   if (r.banned_at) return { label: "Banned", cls: "bg-danger-soft text-danger" };
-  if (r.left_at) return { label: "Left", cls: "bg-surface-muted text-muted" };
+  if (r.left_at) return { label: "Left", cls: "bg-surface-muted text-muted-foreground" };
   if (!r.completed_at) return { label: "Setting up", cls: "bg-warning-soft text-warning-fg" };
   return { label: "Active", cls: "bg-success-soft text-success" };
 }
@@ -23,12 +23,12 @@ export default async function AttendeesPage({ params }: { params: Promise<{ even
   return (
     <main className="flex flex-col gap-6">
       <Card title={`Attendees (${active})`}>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Names and roles only. Bios, interests and messages stay private to attendees; you&apos;ll see interests as
           totals in analytics.
         </p>
         {rows.length === 0 ? (
-          <p className="text-muted">No one has joined yet. Share the event link or QR code.</p>
+          <p className="text-muted-foreground">No one has joined yet. Share the event link or QR code.</p>
         ) : (
           <ul className="divide-y divide-border">
             {rows.map((r) => {
@@ -40,7 +40,7 @@ export default async function AttendeesPage({ params }: { params: Promise<{ even
                       {r.full_name || "Unnamed attendee"}
                       <span className={`ml-2 inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${s.cls}`}>{s.label}</span>
                     </p>
-                    <p className="truncate text-sm text-muted">
+                    <p className="truncate text-sm text-muted-foreground">
                       {[r.headline, r.company].filter(Boolean).join(" · ") || "—"} · joined {fmt.format(new Date(r.joined_at))}
                     </p>
                   </div>

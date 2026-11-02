@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { AttendeeShell } from "@/components/events/attendee-shell";
 import { EventProfileForm } from "@/components/events/event-profile-form";
+import { AvatarUploader } from "@/components/avatar-uploader";
+import { Card } from "@/components/ui";
 import { getAttendance } from "@/lib/attendance";
 import { saveEventProfile } from "../actions";
 
@@ -16,7 +18,7 @@ export default async function SetupPage({ params }: { params: Promise<{ slug: st
   if (event.status !== "published") redirect("/home");
 
   const [{ data: account }, { data: tags }, { data: mine }] = await Promise.all([
-    supabase.from("accounts").select("full_name, headline, company").eq("user_id", user.id).single(),
+    supabase.from("accounts").select("full_name, headline, company, avatar_path").eq("user_id", user.id).single(),
     supabase.from("interest_tags").select("id, label, is_official")
       .eq("event_id", event.id).eq("hidden", false).is("merged_into", null).order("label"),
     supabase.from("attendee_interests").select("tag_id").eq("attendee_id", active.id),
@@ -29,8 +31,11 @@ export default async function SetupPage({ params }: { params: Promise<{ slug: st
     <AttendeeShell eventName={event.name}>
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">{active.completed_at ? "Edit your profile" : "Set up your profile"}</h1>
-        <p className="text-muted">This is what other attendees of {event.name} see. Your interests decide who you&apos;re matched with.</p>
+        <p className="text-muted-foreground">This is what other attendees of {event.name} see. Your interests decide who you&apos;re matched with.</p>
       </div>
+      <Card title="Photo">
+        <AvatarUploader userId={user.id} name={account?.full_name ?? ""} path={account?.avatar_path ?? null} />
+      </Card>
       <EventProfileForm
         action={saveEventProfile.bind(null, slug)}
         initial={{

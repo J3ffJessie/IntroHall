@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Broadcast, ListChecks, Trash } from "@phosphor-icons/react/dist/ssr";
 import { Card, StatusBadge } from "@/components/ui";
 import { DeleteEventButton } from "@/components/events/delete-event-button";
 import { StatusControls } from "@/components/events/status-controls";
@@ -23,24 +24,24 @@ export default async function EventOverviewPage({ params }: { params: Promise<{ 
 
   return (
     <main className="flex flex-col gap-6">
-      <Card title="Status">
+      <Card title="Status" icon={<Broadcast weight="duotone" />}>
         <p>
           <StatusBadge status={event.status} />
-          <span className="ml-2 text-muted">{formatEventRange(event.starts_at, event.ends_at, event.timezone)}</span>
+          <span className="ml-2 text-muted-foreground">{formatEventRange(event.starts_at, event.ends_at, event.timezone)}</span>
         </p>
         <p className="text-sm">
           Event page: <a href={url} className="break-all text-primary underline underline-offset-2 hover:text-primary-hover">{url}</a>
-          {event.status !== "published" && <span className="text-muted"> (visible after publishing)</span>}
+          {event.status !== "published" && <span className="text-muted-foreground"> (visible after publishing)</span>}
         </p>
         <StatusControls eventId={eventId} status={event.status} canArchive={role !== "staff"} />
       </Card>
       {event.status === "draft" && (
-        <Card title="Before you publish">
+        <Card title="Before you publish" icon={<ListChecks weight="duotone" />}>
           <ul className="flex flex-col gap-1 text-sm">
             {checklist.map((c) => (
               <li key={c.label}>
-                <span aria-hidden className={c.done ? "text-success" : "text-muted"}>{c.done ? "✓" : "○"}</span>{" "}
-                <span className={c.done ? "" : "text-muted"}>{c.label}</span>
+                <span aria-hidden className={c.done ? "text-success" : "text-muted-foreground"}>{c.done ? "✓" : "○"}</span>{" "}
+                <span className={c.done ? "" : "text-muted-foreground"}>{c.label}</span>
                 <span className="sr-only">{c.done ? " (done)" : " (to do)"}</span>
               </li>
             ))}
@@ -48,8 +49,8 @@ export default async function EventOverviewPage({ params }: { params: Promise<{ 
         </Card>
       )}
       {role !== "staff" && (
-        <Card title="Delete event">
-          <p className="text-sm text-muted">
+        <Card title="Delete event" icon={<Trash weight="duotone" />}>
+          <p className="text-sm text-muted-foreground">
             Takes the event page offline and closes it for attendees. Restorable for 30 days; after that the
             event, its attendees, messages and images are permanently deleted.
           </p>

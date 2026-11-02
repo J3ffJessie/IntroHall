@@ -29,7 +29,7 @@ export default async function ChatPage({ params }: { params: Promise<{ slug: str
         conversationId={conversationId}
         userId={user.id}
         me={active.id}
-        partner={{ id: convo.other_attendee, name: convo.full_name, headline: convo.headline }}
+        partner={{ id: convo.other_attendee, name: convo.full_name, headline: convo.headline, avatarPath: convo.avatar_path }}
         readOnlyReason={convo.read_only_reason}
         initialMessages={(messages ?? []).reverse()}
         timeZone={event.timezone}
