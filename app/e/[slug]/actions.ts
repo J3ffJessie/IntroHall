@@ -1,10 +1,12 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAttendance } from "@/lib/attendance";
 import { friendlyDbError } from "@/lib/db-errors";
 import { parseEventProfileForm } from "@/lib/event-profile";
 import { fail, type FormState } from "@/lib/form-state";
+import { PENDING_CONNECT_COOKIE } from "@/lib/qr";
 
 async function requireActive(slug: string) {
   const data = await getAttendance(slug);
@@ -29,6 +31,13 @@ export async function saveEventProfile(slug: string, _prev: FormState, form: For
     p_event_id: event.id, p_tag_ids: v.tag_ids, p_custom_labels: v.custom,
   });
   if (error) return fail(friendlyDbError(error));
+  // Someone scanned a personal code before joining: finish that connection now.
+  const jar = await cookies();
+  const pending = jar.get(PENDING_CONNECT_COOKIE)?.value;
+  if (pending) {
+    jar.delete(PENDING_CONNECT_COOKIE);
+    redirect(`/c/${encodeURIComponent(pending)}`);
+  }
   redirect("/home");
 }
 
@@ -76,4 +85,18 @@ export async function reportAttendee(slug: string, attendeeId: string, reason: s
     p_attendee_id: attendeeId, p_reason: reason, p_message_id: messageId,
   });
   return error ? friendlyDbError(error) : null;
+}
+
+// ---- Personal connect codes (scan to connect).
+
+export async function rotateConnectCode(slug: string): Promise<{ error?: string; token?: string }> {
+  const { supabase, event } = await requireActive(slug);
+  const { data, error } = await supabase.rpc("get_connect_token", { p_event_id: event.id, p_rotate: true });
+  return error || !data ? { error: error ? friendlyDbError(error) : "Something went wrong. Please try again." } : { token: data };
+}
+
+export async function connectWithCode(slug: string, token: string): Promise<{ error?: string; conversationId?: string }> {
+  const { supabase } = await requireActive(slug);
+  const { data, error } = await supabase.rpc("connect_by_token", { p_token: token });
+  return error || !data ? { error: error ? friendlyDbError(error) : "Something went wrong. Please try again." } : { conversationId: data };
 }

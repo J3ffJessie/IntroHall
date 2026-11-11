@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Avatar } from "@/components/avatar";
 import { AttendeeShell } from "@/components/events/attendee-shell";
 import { HomeActions } from "@/components/events/home-actions";
+import { MyConnectCode } from "@/components/events/my-connect-code";
 import { PushSettings } from "@/components/events/push-settings";
 import { SignOutButton } from "@/components/events/sign-out-button";
 import { buttonClass, Card } from "@/components/ui";
@@ -22,10 +23,12 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
   if (!user || !active) redirect("/join");
   if (!active.completed_at) redirect("/setup");
 
-  const [{ data: account }, { data: interests }, badge] = await Promise.all([
+  const open = event.status === "published";
+  const [{ data: account }, { data: interests }, badge, { data: connectToken }] = await Promise.all([
     supabase.from("accounts").select("full_name, headline, company, avatar_path").eq("user_id", user.id).single(),
     supabase.from("attendee_interests").select("interest_tags(label)").eq("attendee_id", active.id),
     inboxCount(supabase, event.id),
+    open ? supabase.rpc("get_connect_token", { p_event_id: event.id }) : Promise.resolve({ data: null }),
   ]);
   const labels = (interests ?? []).map((i) => i.interest_tags?.label).filter(Boolean).sort() as string[];
   const hidden = active.visibility === "hidden";
@@ -63,6 +66,10 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
           ))}
         </ul>
       </Card>
+
+      {connectToken && (
+        <MyConnectCode slug={slug} rootDomain={ROOT_DOMAIN} protocol={PROTOCOL} initialToken={connectToken} />
+      )}
 
       {!archived && <PushSettings eventId={event.id} />}
       {!archived && <HomeActions slug={slug} hidden={hidden} eventName={event.name} />}

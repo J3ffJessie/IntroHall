@@ -247,6 +247,33 @@ export type Database = {
           },
         ];
       };
+      connect_tokens: {
+        Row: {
+          attendee_id: string;
+          created_at: string;
+          token: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          attendee_id: string;
+          created_at?: string;
+          token: string;
+        };
+        Update: {
+          attendee_id?: string;
+          created_at?: string;
+          token?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "connect_tokens_attendee_id_fkey";
+            columns: ["attendee_id"];
+            isOneToOne: true;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       connection_requests: {
         Row: {
           created_at: string;
@@ -257,6 +284,7 @@ export type Database = {
           responded_at: string | null;
           status: string;
           to_attendee: string;
+          via: string;
         };
         ComputedFields: never;
         Insert: {
@@ -268,6 +296,7 @@ export type Database = {
           responded_at?: string | null;
           status?: string;
           to_attendee: string;
+          via?: string;
         };
         Update: {
           created_at?: string;
@@ -278,6 +307,7 @@ export type Database = {
           responded_at?: string | null;
           status?: string;
           to_attendee?: string;
+          via?: string;
         };
         Relationships: [
           {
@@ -1088,6 +1118,7 @@ export type Database = {
       am_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       archive_event: { Args: { p_event_id: string }; Returns: undefined };
       block_attendee: { Args: { p_attendee_id: string }; Returns: undefined };
+      connect_by_token: { Args: { p_token: string }; Returns: string };
       create_invite: {
         Args: { p_email: string; p_org_id: string; p_role: string };
         Returns: string;
@@ -1100,6 +1131,10 @@ export type Database = {
       delete_event: { Args: { p_event_id: string }; Returns: undefined };
       delete_organization: { Args: { p_org_id: string }; Returns: undefined };
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
+      get_connect_token: {
+        Args: { p_event_id: string; p_rotate?: boolean };
+        Returns: string;
+      };
       get_connections: {
         Args: { p_event_id: string };
         Returns: {
@@ -1214,6 +1249,19 @@ export type Database = {
       merge_tags: {
         Args: { p_from: string; p_into: string };
         Returns: undefined;
+      };
+      preview_connect_token: {
+        Args: { p_token: string };
+        Returns: {
+          attendee_id: string;
+          avatar_path: string;
+          company: string;
+          conversation_id: string;
+          event_id: string;
+          full_name: string;
+          headline: string;
+          state: string;
+        }[];
       };
       publish_announcement: {
         Args: { p_announcement_id: string };

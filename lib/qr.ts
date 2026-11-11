@@ -16,3 +16,11 @@ export function qrSvg(url: string): Promise<string> {
 export function qrPngDataUrl(url: string): Promise<string> {
   return QRCode.toDataURL(url, { ...options, width: 1024 });
 }
+
+/** Personal connect URL in an attendee's own QR code: scanning it opens the connect confirm screen. */
+export function connectUrl(slug: string, rootDomain: string, protocol: string, token: string): string {
+  return `${protocol}://${slug}.${rootDomain}/c/${encodeURIComponent(token)}`;
+}
+
+/** Cookie (event host only) that carries a scanned code through sign-in, join and profile setup. */
+export const PENDING_CONNECT_COOKIE = "ih_connect";
