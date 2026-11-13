@@ -4,6 +4,82 @@ Conference networking: organizers publish branded event pages at `{slug}.<host>`
 
 The design and phased delivery plan lives in `../.omc/plans/conference-network-platform.md`.
 
+## Features
+
+### Accounts (everyone)
+- **Sign in without a password**: a 6-digit email code, or Continue with Google.
+- **One IntroHall account across events**: name, headline, company and an optional profile photo (cropped in the
+  browser to 512 px; location data stripped).
+- **Download my data** (JSON of everything the account holds) and **Delete account** at `app.<domain>/profile`.
+
+### Organizers (`app.<domain>/dashboard`)
+- **Organizations and team**
+  - Create organizations and invite teammates by link as **Admin** or **Staff**. Staff can run events but can't
+    archive them or delete events or the organization. Remove members.
+  - Soft-delete events and organizations. Deleted events can be restored for 30 days from **Recently deleted**.
+- **Event setup**
+  - **Details**: name, address (`{slug}.<domain>`, locked once published), time zone, start and end, venue,
+    description.
+  - **Attendee settings**: allow custom interests and set the maximum per attendee. Message retention after the
+    event is 7–90 days (default 30).
+  - **Branding**: header banner and link-preview image.
+  - **Interests**: the official interest list. Hide tags, and **merge duplicates** (e.g. "GenAI" into
+    "Generative AI") without anyone losing a tag.
+  - **Access & QR**: choose who can join. **Open** means anyone with the link. **Code** requires a 10-character
+    join code that can be regenerated. Download the join QR code as a 1024 px PNG or as an SVG for printing.
+  - **Publish checklist** before going live; publish, unpublish and archive. Events auto-archive 14 days after they
+    end.
+- **Running the event**
+  - **Announcements**: post now or schedule; pin important ones. They appear on the public event page and attendee
+    home, and are pushed to phones with notifications on.
+  - **Attendees**: roster by status (active, setting up, left, banned). **Remove** (can rejoin) or **Ban** (can't),
+    and unban.
+  - **Reports**: moderation queue with live alerts and a snapshot of the reported message. Resolve with a note,
+    remove or ban.
+  - **Analytics**: joined, completed profiles, requests sent and accepted, conversations started, joins over time
+    and top interests.
+
+### Attendees (`{slug}.<domain>`)
+- **Event page**: branded page with dates, venue, description, topics and announcements. It can be installed to
+  the Home Screen as an app for that event.
+- **Joining**: scan the event QR code (or open the link), sign in, and enter the join code if the event requires
+  one. Then **set up an event profile**: bio, what you're looking for, and interests (official ones plus custom
+  ones if allowed).
+- **Matches**: people ranked by shared interests, with rarer shared interests counting for more. Filter by
+  interest, or browse **Everyone**.
+- **Connecting**
+  - Send a **connect request** with an optional note. If two people request each other, they're connected
+    automatically. Declines are silent, and you can withdraw a pending request.
+  - **Personal connect QR code** (Profile tab). Someone scans it with their phone camera and taps Connect to
+    connect instantly, with no request to accept. This works even before they've joined: they sign in, join, set
+    up and land back on the connect screen. The code owner gets a notification. **Reset code** voids old copies.
+- **Messaging**
+  - Realtime 1:1 chat with connections and unread badges.
+  - Messages typed offline are queued and sent when you reconnect.
+- **Private notes on connections**: a note only you can see ("Runs infra at a fintech, send deck"). Edit it in the
+  chat header; a one-line preview shows in the Inbox. It stays after the event and is included in Download my data.
+- **Contact export** (Inbox → Export contacts): download your connections at the event as a vCard (.vcf, opens in
+  phone, Google and Outlook contacts) or a CSV spreadsheet. Each contact has name, headline, company, profile links,
+  when you connected, your private note and a link back to the chat. Works after the event ends and after you leave
+  (`{slug}.<domain>/contacts?format=vcf|csv`). Blocked and banned people are left out. Profile links are only ever
+  shown to connections, through this export.
+- **Notifications** (Web Push): new requests, accepted requests and QR connects, messages and announcements. On
+  iPhone this needs the event added to the Home Screen.
+- **Privacy and safety**
+  - **Hide my profile** from matches; existing chats and your QR code still work.
+  - **Leave event** (you can rejoin).
+  - **Block** someone (closes the chat) and **report** a person or a specific message to the organizers.
+
+### Platform admins (`app.<domain>/admin`)
+- Find and suspend organizations or people. A suspended person can't sign in and is removed from every event.
+
+### Not built yet (ideas, roughly in priority order)
+"Open to" intent chips (hiring, job hunting, mentoring…) · event
+agenda / sessions · announcements targeted at an interest · org ownership
+transfer · analytics CSV and post-event summary · printable badge QR · "new matches" digest push · icebreaker
+prompts · "here now" presence · Add to Calendar (.ics) · invite emails via Resend · billing (Stripe) · custom
+domains.
+
 ## Stack
 Next.js (App Router, TypeScript, Tailwind) on Vercel · Supabase (Postgres + RLS, Auth, Storage, Realtime, pg_cron, pgmq).
 

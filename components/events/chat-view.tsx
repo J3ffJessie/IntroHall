@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { blockAttendee } from "@/app/e/[slug]/actions";
 import { HandWaving } from "@phosphor-icons/react";
 import { Avatar } from "@/components/avatar";
@@ -25,6 +25,8 @@ type Props = {
   readOnlyReason: string | null;
   initialMessages: Message[];
   timeZone: string;
+  /** Shown under the header (the viewer's private note about this person). */
+  aside?: ReactNode;
 };
 
 const READ_ONLY_TEXT: Record<string, string> = {
@@ -42,7 +44,7 @@ function merge(list: Message[], incoming: Message[]): Message[] {
   return [...byId.values()].sort((a, b) => a.created_at.localeCompare(b.created_at));
 }
 
-export function ChatView({ slug, conversationId, userId, me, partner, readOnlyReason, initialMessages, timeZone }: Props) {
+export function ChatView({ slug, conversationId, userId, me, partner, readOnlyReason, initialMessages, timeZone, aside }: Props) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [messages, setMessages] = useState(initialMessages);
@@ -205,6 +207,8 @@ export function ChatView({ slug, conversationId, userId, me, partner, readOnlyRe
           </div>
         )}
       </div>
+
+      {aside}
 
       {!online && (
         <p role="status" className="rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning-fg">

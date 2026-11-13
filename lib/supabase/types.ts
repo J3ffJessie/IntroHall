@@ -274,6 +274,53 @@ export type Database = {
           },
         ];
       };
+      connection_notes: {
+        Row: {
+          about_attendee: string;
+          body: string;
+          event_id: string;
+          owner_attendee: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          about_attendee: string;
+          body: string;
+          event_id: string;
+          owner_attendee: string;
+          updated_at?: string;
+        };
+        Update: {
+          about_attendee?: string;
+          body?: string;
+          event_id?: string;
+          owner_attendee?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "connection_notes_about_attendee_fkey";
+            columns: ["about_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "connection_notes_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "connection_notes_owner_attendee_fkey";
+            columns: ["owner_attendee"];
+            isOneToOne: false;
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       connection_requests: {
         Row: {
           created_at: string;
@@ -1130,6 +1177,19 @@ export type Database = {
       delete_account_data: { Args: { p_user_id: string }; Returns: undefined };
       delete_event: { Args: { p_event_id: string }; Returns: undefined };
       delete_organization: { Args: { p_org_id: string }; Returns: undefined };
+      export_contacts: {
+        Args: { p_event_id: string };
+        Returns: {
+          company: string;
+          connected_at: string;
+          conversation_id: string;
+          full_name: string;
+          headline: string;
+          links: Json;
+          note: string;
+          other_attendee: string;
+        }[];
+      };
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
       get_connect_token: {
         Args: { p_event_id: string; p_rotate?: boolean };
@@ -1307,6 +1367,10 @@ export type Database = {
       };
       restore_event: { Args: { p_event_id: string }; Returns: undefined };
       rotate_join_code: { Args: { p_event_id: string }; Returns: string };
+      save_connection_note: {
+        Args: { p_about_attendee: string; p_body: string };
+        Returns: undefined;
+      };
       save_push_subscription: {
         Args: {
           p_auth: string;

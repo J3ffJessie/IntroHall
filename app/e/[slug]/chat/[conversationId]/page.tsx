@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { AttendeeShell } from "@/components/events/attendee-shell";
 import { ChatView } from "@/components/events/chat-view";
+import { ConnectionNote } from "@/components/events/connection-note";
 import { getAttendance } from "@/lib/attendance";
 
 export const metadata: Metadata = { title: "Chat", robots: { index: false } };
@@ -20,6 +21,9 @@ export default async function ChatPage({ params }: { params: Promise<{ slug: str
   ]);
   const convo = (conversations ?? []).find((c) => c.conversation_id === conversationId);
   if (!convo) notFound();
+  const { data: note } = convo.other_attendee
+    ? await supabase.from("connection_notes").select("body").eq("about_attendee", convo.other_attendee).maybeSingle()
+    : { data: null };
 
   return (
     <AttendeeShell eventName={event.name} current="inbox" userId={user.id} liveEvents={["request", "conversation"]}
@@ -33,6 +37,9 @@ export default async function ChatPage({ params }: { params: Promise<{ slug: str
         readOnlyReason={convo.read_only_reason}
         initialMessages={(messages ?? []).reverse()}
         timeZone={event.timezone}
+        aside={convo.other_attendee && (
+          <ConnectionNote slug={slug} attendeeId={convo.other_attendee} name={convo.full_name} initial={note?.body ?? ""} />
+        )}
       />
     </AttendeeShell>
   );

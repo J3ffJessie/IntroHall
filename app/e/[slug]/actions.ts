@@ -100,3 +100,14 @@ export async function connectWithCode(slug: string, token: string): Promise<{ er
   const { data, error } = await supabase.rpc("connect_by_token", { p_token: token });
   return error || !data ? { error: error ? friendlyDbError(error) : "Something went wrong. Please try again." } : { conversationId: data };
 }
+
+// ---- Private notes on connections. Allowed after the event too, so only sign-in is checked here.
+
+export async function saveConnectionNote(slug: string, aboutAttendeeId: string, body: string): Promise<string | null> {
+  const data = await getAttendance(slug);
+  if (!data?.user) redirect("/join");
+  const { error } = await data.supabase.rpc("save_connection_note", {
+    p_about_attendee: aboutAttendeeId, p_body: body.slice(0, 2000),
+  });
+  return error ? friendlyDbError(error) : null;
+}

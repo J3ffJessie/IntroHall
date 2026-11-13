@@ -21,7 +21,11 @@ export function ProfileForm({ initial }: { initial: ProfileInput }) {
         <input id="company" name="company" maxLength={100} defaultValue={initial.company} className={input} />
       </Field>
       <Field id="links" label="Links (one per line, up to 5)">
-        <textarea id="links" name="links" rows={3} defaultValue={initial.links.join("\n")} className={input} />
+        <textarea id="links" name="links" rows={3} defaultValue={initial.links.join("\n")} className={input}
+                  aria-describedby="links-hint" />
+        <p id="links-hint" className="text-xs text-muted-foreground">
+          Only people you connect with see these, in the contacts they export.
+        </p>
       </Field>
       <button type="submit" disabled={pending}
               className="rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-primary-hover disabled:opacity-50">

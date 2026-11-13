@@ -20,6 +20,7 @@ export default function PrivacyPage() {
       <h2>Who sees it</h2>
       <ul>
         <li>Other attendees of the same event see your event profile and interests unless you hide your profile.</li>
+        <li>People you connect with can export you as a contact: your name, headline, company and links.</li>
         <li>Organizers see your name, company and headline, and when you joined. They see interests only as totals,
             never per person, and they never read your messages, except a message you or someone else reports.</li>
         <li>We do not sell your data.</li>
