@@ -10,7 +10,7 @@ export const getAttendance = cache(async (slug: string) => {
   const { data: { user } } = await supabase.auth.getUser();
   const { data: attendee } = user
     ? await supabase.from("attendees")
-        .select("id, bio, looking_for, visibility, completed_at, left_at, banned_at")
+        .select("id, bio, looking_for, open_to, visibility, completed_at, left_at, banned_at")
         .eq("event_id", data.event.id).eq("user_id", user.id).maybeSingle()
     : { data: null };
   const active = attendee && !attendee.left_at && !attendee.banned_at ? attendee : null;

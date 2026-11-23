@@ -12,7 +12,7 @@ export default function PrivacyPage() {
       <h2>What we collect</h2>
       <ul>
         <li>Account: your email, name, and optional headline, company, photo and links.</li>
-        <li>Per event: your bio, what you&apos;re looking for, and the interests you pick.</li>
+        <li>Per event: your bio, what you&apos;re looking for, what you&apos;re open to (hiring, mentoring…), and the interests you pick.</li>
         <li>Connections and messages you send to other attendees.</li>
         <li>Reports you file, including a copy of the reported message.</li>
       </ul>
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       <ul>
         <li>Other attendees of the same event see your event profile and interests unless you hide your profile.</li>
         <li>People you connect with can export you as a contact: your name, headline, company and links.</li>
-        <li>Organizers see your name, company and headline, and when you joined. They see interests only as totals,
+        <li>Organizers see your name, company and headline, and when you joined. They see interests and “open to” choices only as totals,
             never per person, and they never read your messages, except a message you or someone else reports.</li>
         <li>We do not sell your data.</li>
       </ul>

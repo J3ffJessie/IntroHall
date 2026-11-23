@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeOpenTo, OPEN_TO } from "@/lib/open-to";
 
 // Mirrors the CHECK constraints on accounts / attendees and the rules in upsert_interests().
 export const MAX_INTERESTS = 10;
@@ -9,6 +10,8 @@ export const eventProfileSchema = z.object({
   company: z.string().trim().max(100),
   bio: z.string().trim().max(500, "Bio is at most 500 characters"),
   looking_for: z.string().trim().max(280, "“Looking for” is at most 280 characters"),
+  open_to: z.array(z.enum(OPEN_TO.map((o) => o.key) as [string, ...string[]], "Unknown “Open to” option"))
+    .transform(normalizeOpenTo),
   tag_ids: z.array(z.string().uuid()),
   custom: z.array(z.string().trim().min(1).max(40, "Interests are at most 40 characters")),
 }).refine((v) => v.tag_ids.length + v.custom.length >= 1, { message: "Pick at least one interest" })
@@ -21,6 +24,7 @@ export function parseEventProfileForm(form: FormData) {
     company: form.get("company") ?? "",
     bio: form.get("bio") ?? "",
     looking_for: form.get("looking_for") ?? "",
+    open_to: form.getAll("open_to").map(String),
     tag_ids: form.getAll("tag_id").map(String),
     custom: form.getAll("custom").map(String).filter((s) => s.trim()),
   });

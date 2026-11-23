@@ -44,6 +44,7 @@ export default async function SetupPage({ params }: { params: Promise<{ slug: st
           company: account?.company ?? "",
           bio: active.bio,
           looking_for: active.looking_for,
+          open_to: active.open_to,
         }}
         // Offer official tags plus any attendee tag the user already has; selected ones first.
         tags={(tags ?? []).filter((t) => t.is_official || mineIds.has(t.id))

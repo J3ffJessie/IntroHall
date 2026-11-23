@@ -1,7 +1,8 @@
-import { ChartBar, Tag } from "@phosphor-icons/react/dist/ssr";
+import { ChartBar, Handshake, Tag } from "@phosphor-icons/react/dist/ssr";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 import { Card } from "@/components/ui";
 import { type EventAnalytics, joinBuckets, percent } from "@/lib/analytics";
+import { openToLabel } from "@/lib/open-to";
 
 const fmt = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 });
 
@@ -62,8 +63,9 @@ function JoinsChart({ rows }: { rows: EventAnalytics["joins_by_hour"] }) {
   );
 }
 
-function TopTags({ tags }: { tags: EventAnalytics["top_tags"] }) {
-  if (!tags.length) return <p className="text-muted-foreground">No interests picked yet.</p>;
+function TopTags({ tags, empty = "No interests picked yet." }:
+  { tags: { label: string; attendees: number; hidden?: boolean }[]; empty?: string }) {
+  if (!tags.length) return <p className="text-muted-foreground">{empty}</p>;
   const max = Math.max(...tags.map((t) => t.attendees));
   return (
     <ol className="flex flex-col gap-2">
@@ -103,6 +105,11 @@ export function AnalyticsView({ data }: { data: EventAnalytics }) {
       <Card title="Top interests" icon={<Tag weight="duotone" />}>
         <p className="text-sm text-muted-foreground">Among attendees currently in the event. Individual choices are never shown.</p>
         <TopTags tags={data.top_tags} />
+      </Card>
+      <Card title="Open to" icon={<Handshake weight="duotone" />}>
+        <p className="text-sm text-muted-foreground">How many attendees are hiring, looking for work, mentoring and so on. Totals only.</p>
+        <TopTags tags={data.open_to.map((o) => ({ label: openToLabel(o.intent), attendees: o.attendees }))}
+                 empty="No one has picked an “Open to” option yet." />
       </Card>
     </div>
   );

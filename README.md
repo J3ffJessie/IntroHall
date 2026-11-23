@@ -36,8 +36,8 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
     and unban.
   - **Reports**: moderation queue with live alerts and a snapshot of the reported message. Resolve with a note,
     remove or ban.
-  - **Analytics**: joined, completed profiles, requests sent and accepted, conversations started, joins over time
-    and top interests.
+  - **Analytics**: joined, completed profiles, requests sent and accepted, conversations started, joins over time,
+    top interests and "Open to" totals.
 
 ### Attendees (`{slug}.<domain>`)
 - **Event page**: branded page with dates, venue, description, topics and announcements. It can be installed to
@@ -47,6 +47,10 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
   ones if allowed).
 - **Matches**: people ranked by shared interests, with rarer shared interests counting for more. Filter by
   interest, or browse **Everyone**.
+- **Open to**: optional intent chips on the event profile (Hiring, Looking for work, Mentoring others, Finding a
+  mentor, Finding a co-founder, Investing, Raising funding). They show on match cards, and Matches and Everyone can be
+  filtered by them. Intents that pair with yours (Hiring ↔ Looking for work, Mentoring ↔ Finding a mentor,
+  Investing ↔ Raising funding, co-founder ↔ co-founder) are highlighted on the card; ranking is unchanged.
 - **Connecting**
   - Send a **connect request** with an optional note. If two people request each other, they're connected
     automatically. Declines are silent, and you can withdraw a pending request.
@@ -74,8 +78,7 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
 - Find and suspend organizations or people. A suspended person can't sign in and is removed from every event.
 
 ### Not built yet (ideas, roughly in priority order)
-"Open to" intent chips (hiring, job hunting, mentoring…) · event
-agenda / sessions · announcements targeted at an interest · org ownership
+Event agenda / sessions · announcements targeted at an interest · org ownership
 transfer · analytics CSV and post-event summary · printable badge QR · "new matches" digest push · icebreaker
 prompts · "here now" presence · Add to Calendar (.ics) · invite emails via Resend · billing (Stripe) · custom
 domains.

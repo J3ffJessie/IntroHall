@@ -111,7 +111,7 @@ select throws_ok($$select public.get_event_analytics(pg_temp.k('e'))$$, '42501',
 select pg_temp.as_user(pg_temp.k('s'));
 create temp table an as select public.get_event_analytics(pg_temp.k('e')) as j;
 reset role;
-select is((select j - 'joins_by_hour' - 'top_tags' from an),
+select is((select j - 'joins_by_hour' - 'top_tags' - 'open_to' from an),
           '{"joined":4,"completed":3,"active":3,"left":0,"removed":0,"requests_sent":2,"requests_accepted":1,"conversations_started":1}'::jsonb,
           'staff see the fixture counts');
 select is((select j -> 'joins_by_hour' from an),

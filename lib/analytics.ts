@@ -11,6 +11,7 @@ const analyticsSchema = z.object({
   conversations_started: z.number(),
   joins_by_hour: z.array(z.object({ hour: z.string(), joins: z.number() })),
   top_tags: z.array(z.object({ label: z.string(), attendees: z.number(), hidden: z.boolean() })),
+  open_to: z.array(z.object({ intent: z.string(), attendees: z.number() })).default([]),
 });
 export type EventAnalytics = z.infer<typeof analyticsSchema>;
 

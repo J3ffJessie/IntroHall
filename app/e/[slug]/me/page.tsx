@@ -11,6 +11,7 @@ import { buttonClass, Card } from "@/components/ui";
 import { getAttendance } from "@/lib/attendance";
 import { inboxCount } from "@/lib/inbox";
 import { PROTOCOL, ROOT_DOMAIN } from "@/lib/env";
+import { normalizeOpenTo, openToLabel } from "@/lib/open-to";
 import { formatEventRange } from "@/lib/time";
 
 export const metadata: Metadata = { title: "My profile", robots: { index: false } };
@@ -60,6 +61,9 @@ export default async function MyProfilePage({ params }: { params: Promise<{ slug
         </div>
         {active.bio && <p className="whitespace-pre-line">{active.bio}</p>}
         {active.looking_for && <p><span className="font-medium">Looking for:</span> {active.looking_for}</p>}
+        {active.open_to.length > 0 && (
+          <p><span className="font-medium">Open to:</span> {normalizeOpenTo(active.open_to).map(openToLabel).join(" · ")}</p>
+        )}
         <ul className="flex flex-wrap gap-2" aria-label="Your interests">
           {labels.map((l) => (
             <li key={l} className="rounded-full bg-primary-soft px-3 py-1 text-sm font-medium text-primary-soft-fg">{l}</li>

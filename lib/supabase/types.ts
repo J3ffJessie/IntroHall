@@ -156,6 +156,7 @@ export type Database = {
           joined_via: string;
           left_at: string | null;
           looking_for: string;
+          open_to: string[];
           user_id: string;
           visibility: string;
         };
@@ -170,6 +171,7 @@ export type Database = {
           joined_via: string;
           left_at?: string | null;
           looking_for?: string;
+          open_to?: string[];
           user_id: string;
           visibility?: string;
         };
@@ -183,6 +185,7 @@ export type Database = {
           joined_via?: string;
           left_at?: string | null;
           looking_for?: string;
+          open_to?: string[];
           user_id?: string;
           visibility?: string;
         };
@@ -1265,6 +1268,7 @@ export type Database = {
           p_limit?: number;
           p_mode?: string;
           p_offset?: number;
+          p_open_to?: string;
           p_tag?: string;
         };
         Returns: {
@@ -1276,6 +1280,7 @@ export type Database = {
           full_name: string;
           headline: string;
           looking_for: string;
+          open_to: string[];
           score: number;
           shared_tags: string[];
         }[];

@@ -25,7 +25,7 @@ export async function saveEventProfile(slug: string, _prev: FormState, form: For
     .update({ full_name: v.full_name, headline: v.headline, company: v.company }).eq("user_id", user.id);
   if (accErr) return fail(friendlyDbError(accErr));
   const { error: attErr } = await supabase.from("attendees")
-    .update({ bio: v.bio, looking_for: v.looking_for }).eq("id", active.id);
+    .update({ bio: v.bio, looking_for: v.looking_for, open_to: v.open_to }).eq("id", active.id);
   if (attErr) return fail(friendlyDbError(attErr));
   const { error } = await supabase.rpc("upsert_interests", {
     p_event_id: event.id, p_tag_ids: v.tag_ids, p_custom_labels: v.custom,

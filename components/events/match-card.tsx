@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/avatar";
 import { FadeIn } from "@/components/motion/fade-in";
 import { OverlapMark } from "@/components/overlap";
+import { complementary, normalizeOpenTo, openToLabel } from "@/lib/open-to";
 import { ConnectButton, type Connection } from "./connect-button";
 
 type Person = {
@@ -11,12 +12,15 @@ type Person = {
   avatar_path: string | null;
   bio: string;
   looking_for: string;
+  open_to: string[];
   shared_tags: string[];
 };
 
-export function MatchCard({ person: p, slug, connection, index = 0 }:
-  { person: Person; slug: string; connection: Connection; index?: number }) {
+export function MatchCard({ person: p, slug, connection, index = 0, myOpenTo = [] }:
+  { person: Person; slug: string; connection: Connection; index?: number; myOpenTo?: string[] }) {
   const role = [p.headline, p.company].filter(Boolean).join(" · ");
+  const openTo = normalizeOpenTo(p.open_to);
+  const fits = new Set(complementary(myOpenTo, openTo));
   return (
     <FadeIn index={index}>
     <article className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md">
@@ -38,6 +42,20 @@ export function MatchCard({ person: p, slug, connection, index = 0 }:
             <li key={t} className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-soft-fg">{t}</li>
           ))}
         </ul>
+      )}
+      {openTo.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+          <span aria-hidden className="font-medium text-muted-foreground">Open to</span>
+          <ul className="flex flex-wrap gap-1.5" aria-label="Open to">
+            {openTo.map((k) => (
+              <li key={k} className={`rounded-full border px-2.5 py-1 font-medium ${fits.has(k)
+                ? "border-highlight/50 bg-highlight-soft text-highlight-soft-fg"
+                : "border-border-strong text-fg"}`}>
+                {openToLabel(k)}{fits.has(k) && <span className="sr-only"> (pairs with what you&apos;re open to)</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       {p.looking_for && <p className="text-sm"><span className="font-medium">Looking for:</span> {p.looking_for}</p>}
       {p.bio && <p className="line-clamp-3 text-sm text-muted-foreground">{p.bio}</p>}

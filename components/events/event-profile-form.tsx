@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button, Card, Field, FormMessage, inputClass } from "@/components/ui";
 import { MAX_INTERESTS } from "@/lib/event-profile";
+import { normalizeOpenTo, OPEN_TO } from "@/lib/open-to";
 import type { FormState } from "@/lib/form-state";
 import { tagKey } from "@/lib/tags";
 import { useFormAction } from "@/lib/use-form-action";
@@ -11,7 +12,7 @@ import { useHydrated } from "@/lib/use-hydrated";
 type Tag = { id: string; label: string; selected: boolean };
 type Props = {
   action: (prev: FormState, form: FormData) => Promise<FormState>;
-  initial: { full_name: string; headline: string; company: string; bio: string; looking_for: string };
+  initial: { full_name: string; headline: string; company: string; bio: string; looking_for: string; open_to: string[] };
   tags: Tag[];
   allowCustom: boolean;
   maxCustom: number;
@@ -22,6 +23,12 @@ export function EventProfileForm({ action, initial, tags, allowCustom, maxCustom
   const [state, onSubmit, pending] = useFormAction(action);
   const hydrated = useHydrated();
   const [selected, setSelected] = useState(() => new Set(tags.filter((t) => t.selected).map((t) => t.id)));
+  const [openTo, setOpenTo] = useState<Set<string>>(() => new Set(normalizeOpenTo(initial.open_to)));
+  const toggleOpenTo = (key: string) => {
+    const next = new Set(openTo);
+    if (next.has(key)) next.delete(key); else next.add(key);
+    setOpenTo(next);
+  };
   const [custom, setCustom] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
   const [hint, setHint] = useState<string | null>(null);
@@ -116,6 +123,28 @@ export function EventProfileForm({ action, initial, tags, allowCustom, maxCustom
         <Field id="looking_for" label="I'm looking for" hint="e.g. co-founders, Rust contributors, design feedback">
           <input id="looking_for" name="looking_for" maxLength={280} defaultValue={initial.looking_for} className={inputClass} />
         </Field>
+      </Card>
+
+      <Card title="Open to">
+        <p id="open-to-hint" className="text-sm text-muted-foreground">
+          Optional. Shown on your card so the right people find you, and anyone can filter Matches by it.
+        </p>
+        <ul className="flex flex-wrap gap-2" aria-describedby="open-to-hint">
+          {OPEN_TO.map((o) => {
+            const on = openTo.has(o.key);
+            return (
+              <li key={o.key}>
+                <button type="button" aria-pressed={on} onClick={() => toggleOpenTo(o.key)}
+                        className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                          on ? "border-primary bg-primary text-primary-foreground"
+                             : "border-border-strong bg-surface text-fg hover:border-primary"}`}>
+                  {on && <span aria-hidden>✓ </span>}{o.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        {[...openTo].map((k) => <input key={k} type="hidden" name="open_to" value={k} />)}
       </Card>
 
       <Button type="submit" disabled={pending || total === 0 || !hydrated} className="w-full">{pending ? "Saving…" : submitLabel}</Button>

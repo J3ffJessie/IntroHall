@@ -10,12 +10,13 @@ import { LiveRefresh } from "@/components/live-refresh";
 import { getAttendance } from "@/lib/attendance";
 import { connectionMap } from "@/lib/connection-state";
 import { inboxCount } from "@/lib/inbox";
+import { isOpenTo, OPEN_TO, openToLabel } from "@/lib/open-to";
 
 export const metadata: Metadata = { title: "Matches", robots: { index: false } };
 
 const PAGE_SIZE = 30;
 
-type Search = { tab?: string; tag?: string; page?: string };
+type Search = { tab?: string; tag?: string; open?: string; page?: string };
 
 export default async function MatchesPage({ params, searchParams }:
   { params: Promise<{ slug: string }>; searchParams: Promise<Search> }) {
@@ -29,10 +30,11 @@ export default async function MatchesPage({ params, searchParams }:
 
   const tab = sp.tab === "everyone" ? "everyone" : "matches";
   const page = Math.max(0, Number.parseInt(sp.page ?? "0", 10) || 0);
+  const openTo = isOpenTo(sp.open) ? sp.open : undefined;
   const [{ data: tags }, { data: people, error }, { data: connections }, badge, { data: announcements }] = await Promise.all([
     supabase.rpc("get_event_tag_counts", { p_event_id: event.id }),
     supabase.rpc("get_matches", {
-      p_event_id: event.id, p_mode: tab, p_tag: sp.tag || undefined,
+      p_event_id: event.id, p_mode: tab, p_tag: sp.tag || undefined, p_open_to: openTo,
       // One extra row tells us whether there is a next page.
       p_limit: PAGE_SIZE + 1, p_offset: page * PAGE_SIZE,
     }),
@@ -53,9 +55,10 @@ export default async function MatchesPage({ params, searchParams }:
 
   const href = (next: Partial<Search>) => {
     const q = new URLSearchParams();
-    const merged = { tab, tag: sp.tag, ...next };
+    const merged = { tab, tag: sp.tag, open: openTo, ...next };
     if (merged.tab === "everyone") q.set("tab", "everyone");
     if (merged.tag) q.set("tag", merged.tag);
+    if (merged.open) q.set("open", merged.open);
     if (merged.page && merged.page !== "0") q.set("page", merged.page);
     const s = q.toString();
     return s ? `/home?${s}` : "/home";
@@ -114,24 +117,43 @@ export default async function MatchesPage({ params, searchParams }:
         </nav>
       )}
 
+      <nav aria-label="Filter by what people are open to" className="-mx-4 overflow-x-auto px-4">
+        <ul className="flex items-center gap-2 pb-1">
+          <li aria-hidden className="whitespace-nowrap text-sm font-medium text-muted-foreground">Open to</li>
+          <li>
+            <Link href={href({ open: "", page: "0" })} aria-current={!openTo ? "true" : undefined}
+                  className={chip(!openTo)}>Anything</Link>
+          </li>
+          {OPEN_TO.map((o) => (
+            <li key={o.key}>
+              <Link href={href({ open: o.key, page: "0" })} aria-current={openTo === o.key ? "true" : undefined}
+                    className={chip(openTo === o.key)}>{o.label}</Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
       {rows.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border-strong bg-surface/60 p-8 text-center text-muted-foreground">
           <span aria-hidden className="grid size-14 place-items-center rounded-2xl bg-primary-soft text-primary-soft-fg">
             {tab === "matches" ? <MagnifyingGlass weight="duotone" className="size-7" /> : <UsersThree weight="duotone" className="size-7" />}
           </span>
           <p className="max-w-sm">
-          {tab === "matches"
-            ? activeTag
-              ? `No one with “${activeTag.label}” shares your interests yet.`
-              : "No one shares your interests yet. Check back as more people join, or browse Everyone."
-            : "No one here yet."}
+          {openTo
+            ? `No one${activeTag ? ` with “${activeTag.label}”` : ""} has picked “${openToLabel(openTo)}” yet. Try Anything, or the ${tab === "matches" ? "Everyone" : "Matches"} tab.`
+            : tab === "matches"
+              ? activeTag
+                ? `No one with “${activeTag.label}” shares your interests yet.`
+                : "No one shares your interests yet. Check back as more people join, or browse Everyone."
+              : "No one here yet."}
           </p>
         </div>
       ) : (
         <ul className="flex flex-col gap-3" aria-label={tab === "matches" ? "Matches" : "Everyone"}>
           {rows.map((p, i) => (
             <li key={p.attendee_id}>
-              <MatchCard person={p} slug={slug} index={i} connection={conn.get(p.attendee_id) ?? { state: "none" }} />
+              <MatchCard person={p} slug={slug} index={i} connection={conn.get(p.attendee_id) ?? { state: "none" }}
+                         myOpenTo={active.open_to} />
             </li>
           ))}
         </ul>
