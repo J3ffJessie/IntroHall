@@ -13,7 +13,7 @@ select is(
       and (has_function_privilege('anon', p.oid, 'execute')
            or (has_function_privilege('authenticated', p.oid, 'execute')
                and p.proname not in ('my_org_ids', 'my_admin_org_ids', 'my_org_event_ids',
-                                     'my_event_ids', 'my_attendee_ids',
+                                     'my_event_ids', 'my_attendee_ids', 'my_interest_tag_ids',
                                      'my_blocked_attendee_ids', 'my_conversation_ids',
                                      'is_valid_slug', 'normalize_tag')))),
   '{}'::text[],

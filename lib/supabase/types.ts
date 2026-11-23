@@ -1204,6 +1204,14 @@ export type Database = {
         }[];
       };
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
+      get_announcement_audiences: {
+        Args: { p_event_id: string };
+        Returns: {
+          attendees: number;
+          label: string;
+          tag_id: string;
+        }[];
+      };
       get_connect_token: {
         Args: { p_event_id: string; p_rotate?: boolean };
         Returns: string;
@@ -1247,10 +1255,6 @@ export type Database = {
           purge_after: string;
           slug: string;
         }[];
-      };
-      get_announcement_audiences: {
-        Args: { p_event_id: string };
-        Returns: { attendees: number; label: string; tag_id: string }[];
       };
       get_event_analytics: { Args: { p_event_id: string }; Returns: Json };
       get_event_roster: {

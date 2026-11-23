@@ -42,12 +42,15 @@ insert into k select 'rustlang', id from t;
 with t as (insert into public.interest_tags (event_id, label, is_official) values (pg_temp.k('f'), 'Elm', true) returning id)
 insert into k select 'elm', id from t;
 
-insert into k select 'r', id from (insert into public.attendees (event_id, user_id, joined_via, completed_at)
-  values (pg_temp.k('e'), pg_temp.k('ur'), 'link', now()) returning id) x;
-insert into k select 'g', id from (insert into public.attendees (event_id, user_id, joined_via, completed_at)
-  values (pg_temp.k('e'), pg_temp.k('ug'), 'link', now()) returning id) x;
-insert into k select 'l', id from (insert into public.attendees (event_id, user_id, joined_via, completed_at, left_at)
-  values (pg_temp.k('e'), pg_temp.k('ul'), 'link', now(), now()) returning id) x;
+with x as (insert into public.attendees (event_id, user_id, joined_via, completed_at)
+  values (pg_temp.k('e'), pg_temp.k('ur'), 'link', now()) returning id)
+insert into k select 'r', id from x;
+with x as (insert into public.attendees (event_id, user_id, joined_via, completed_at)
+  values (pg_temp.k('e'), pg_temp.k('ug'), 'link', now()) returning id)
+insert into k select 'g', id from x;
+with x as (insert into public.attendees (event_id, user_id, joined_via, completed_at, left_at)
+  values (pg_temp.k('e'), pg_temp.k('ul'), 'link', now(), now()) returning id)
+insert into k select 'l', id from x;
 insert into public.attendee_interests (attendee_id, tag_id, event_id) values
   (pg_temp.k('r'), pg_temp.k('rust'), pg_temp.k('e')),
   (pg_temp.k('g'), pg_temp.k('go'), pg_temp.k('e')),
