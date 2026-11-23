@@ -13,6 +13,9 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
 - **Download my data** (JSON of everything the account holds) and **Delete account** at `app.<domain>/profile`.
 
 ### Organizers (`app.<domain>/dashboard`)
+- **Profile first**: after signing in, a new organizer sets up their profile (name required; headline, company
+  and photo optional) at `app.<domain>/welcome` before creating an organization. Invited teammates do the same
+  before accepting, so the team list never shows an unnamed member. The database enforces it too.
 - **Organizations and team**
   - Create organizations and invite teammates by link as **Admin** or **Staff**. Staff can run events but can't
     archive them or delete events or the organization. Remove members.

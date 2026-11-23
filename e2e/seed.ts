@@ -14,6 +14,9 @@ export async function seedEvent(opts: { ownerId: string; tags: string[]; code?: 
   const slug = `ev-${id}`;
   const { rows: [org] } = await pool.query(
     "insert into public.organizations (name, slug) values ($1, $2) returning id", [`Org ${id}`, `org-${id}`]);
+  // Organizers have a name before they own an org (the app sends nameless accounts to /welcome first).
+  await pool.query("update public.accounts set full_name = $2 where user_id = $1 and btrim(full_name) = ''",
+                   [opts.ownerId, `Organizer ${id}`]);
   await pool.query("insert into public.org_members (org_id, user_id, role) values ($1, $2, 'owner')", [org.id, opts.ownerId]);
   const { rows: [ev] } = await pool.query(
     `insert into public.events (org_id, slug, name, starts_at, ends_at, timezone, status, published_at, join_mode)
@@ -26,7 +29,7 @@ export async function seedEvent(opts: { ownerId: string; tags: string[]; code?: 
   for (const label of opts.tags) {
     await pool.query("insert into public.interest_tags (event_id, label, is_official) values ($1, $2, true)", [ev.id, label]);
   }
-  return { slug, eventId: ev.id as string };
+  return { slug, eventId: ev.id as string, orgId: org.id as string };
 }
 
 /** Adds a completed, visible attendee holding the given (official) tag labels. */
@@ -72,4 +75,21 @@ export async function makePlatformAdmin(userId: string) {
 export async function authUserCount(email: string): Promise<number> {
   const { rows } = await pool.query("select count(*)::int as n from auth.users where email = $1", [email]);
   return rows[0].n;
+}
+
+/** A signed-up user that never signs in through the UI (e.g. an org owner sending invites). */
+export async function seedUser(name: string): Promise<string> {
+  const { rows: [u] } = await pool.query(
+    `insert into auth.users (id, email, aud, role, raw_user_meta_data)
+     values (gen_random_uuid(), gen_random_uuid() || '@seed.test', 'authenticated', 'authenticated', $1) returning id`,
+    [JSON.stringify({ full_name: name })]);
+  return u.id;
+}
+
+/** A pending team invite for `email`; returns the raw token for /invite/{token}. */
+export async function seedInvite(orgId: string, email: string, role: "admin" | "staff" = "staff"): Promise<string> {
+  const token = `tok${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
+  await pool.query("insert into public.org_invites (org_id, email, role, token_hash) values ($1, $2, $3, private.sha256_hex($4))",
+                   [orgId, email.toLowerCase(), role, token]);
+  return token;
 }

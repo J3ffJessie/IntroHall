@@ -2,10 +2,11 @@ begin;
 select plan(52);
 
 -- Users: A owns org A, B owns org B, C is invited to org A.
-insert into auth.users (id, email, aud, role) values
-  ('aaaaaaaa-0000-0000-0000-000000000001', 'a@test.dev', 'authenticated', 'authenticated'),
-  ('bbbbbbbb-0000-0000-0000-000000000002', 'b@test.dev', 'authenticated', 'authenticated'),
-  ('cccccccc-0000-0000-0000-000000000003', 'c@test.dev', 'authenticated', 'authenticated');
+-- Named: organizers must have a name before creating or joining an org (12_organizer_profile).
+insert into auth.users (id, email, aud, role, raw_user_meta_data) values
+  ('aaaaaaaa-0000-0000-0000-000000000001', 'a@test.dev', 'authenticated', 'authenticated', '{"full_name":"Ann A"}'),
+  ('bbbbbbbb-0000-0000-0000-000000000002', 'b@test.dev', 'authenticated', 'authenticated', '{"full_name":"Bo B"}'),
+  ('cccccccc-0000-0000-0000-000000000003', 'c@test.dev', 'authenticated', 'authenticated', '{"full_name":"Cy C"}');
 
 create function pg_temp.as_user(p_id uuid, p_email text) returns void language sql as $$
   select set_config('request.jwt.claims',

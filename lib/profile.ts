@@ -23,3 +23,14 @@ export function parseProfileForm(form: FormData) {
       .filter(Boolean),
   });
 }
+
+/** The first-run (/welcome) subset: links can be added later on /profile. */
+export const welcomeSchema = profileSchema.pick({ full_name: true, headline: true, company: true });
+
+export function parseWelcomeForm(form: FormData) {
+  return welcomeSchema.safeParse({
+    full_name: form.get("full_name") ?? "",
+    headline: form.get("headline") ?? "",
+    company: form.get("company") ?? "",
+  });
+}

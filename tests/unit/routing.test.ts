@@ -27,7 +27,7 @@ describe("decideRoute", () => {
     expect(r("app.introhall.com", "/e/devconf")).toEqual({ action: "notFound" });
   });
   it("sends app pages on the root host to the app host", () => {
-    for (const p of ["/dashboard", "/profile/export", "/admin"]) {
+    for (const p of ["/dashboard", "/profile/export", "/admin", "/welcome"]) {
       expect(r("introhall.com", p)).toEqual({ action: "redirect", url: `https://app.introhall.com${p}`, status: 307 });
     }
     expect(r("introhall.com", "/administer")).toEqual({ action: "next" });

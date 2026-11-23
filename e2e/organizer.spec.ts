@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PNG } from "pngjs";
 import { confirmDialog, expectNoSeriousA11yViolations, latestOtp, openEventSection, signInWithOtp } from "./helpers";
+import { seedEvent, seedInvite, seedUser } from "./seed";
 
 const ROOT = "localtest.me:3000";
 
@@ -15,17 +16,36 @@ function png(width = 4, height = 4): Buffer {
 
 test("organizer creates, brands, publishes an event and gets a QR code", async ({ page, browser }) => {
   // Long journey; on a cold dev server each page compiles on first visit.
-  test.setTimeout(90_000);
+  test.setTimeout(150_000);
   const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
   const slug = `conf-${id}`;
   await signInWithOtp(page, `org-${id}@test.dev`);
 
-  // Organization
+  // Profile first: a new organizer is asked for their name before any organization exists.
   await page.goto("/dashboard");
+  await expect(page).toHaveURL((url) => url.pathname === "/welcome" && url.searchParams.get("next") === "/dashboard");
+  await expect(page.getByRole("heading", { name: "Set up your profile" })).toBeVisible();
+  await expectNoSeriousA11yViolations(page);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByLabel("Your name")).toBeFocused(); // required: the browser blocks an empty submit
+  await expect(page).toHaveURL((url) => url.pathname === "/welcome");
+  await page.getByLabel("Your name").fill(`Olga ${id}`);
+  await page.getByLabel("Role or headline (optional)").fill("Head of events");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Organization
+  await expect(page).toHaveURL((url) => url.pathname === "/dashboard");
   await page.getByLabel("Organization name").fill(`Org ${id}`);
   await page.getByRole("button", { name: "Create organization" }).click();
   await expect(page.getByRole("heading", { name: `Org ${id}` })).toBeVisible();
+  // The team list shows the owner by name, never "Unnamed member".
+  await expect(page.getByText(`Olga ${id}`)).toBeVisible();
+  await expect(page.getByText("Unnamed member")).toHaveCount(0);
   await expectNoSeriousA11yViolations(page);
+  // Once named, /welcome just continues.
+  await page.goto("/welcome?next=/dashboard");
+  await expect(page).toHaveURL((url) => url.pathname === "/dashboard");
+  await page.goBack();
 
   // Event (reserved slug first)
   await page.getByRole("link", { name: "New event" }).click();
@@ -127,19 +147,53 @@ test("root /e/{slug} redirects to the subdomain; unknown subdomain 404s", async 
   expect(missing.status()).toBe(404);
 });
 
-test("signing in from /login lands on the dashboard", async ({ page }) => {
+test("signing in from /login asks a new organizer for their profile, then lands on the dashboard", async ({ page }) => {
   const email = `land-${Date.now()}@test.dev`;
   await page.goto("/login");
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Email me a code" }).click();
   await page.getByLabel(/Code sent to/).fill(await latestOtp(email));
   await page.getByRole("button", { name: "Verify" }).click();
+  await expect(page).toHaveURL((url) => url.pathname === "/welcome");
+  await page.getByLabel("Your name").fill("Lena Landing");
+  await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL((url) => url.pathname === "/dashboard");
   await expect(page.getByRole("heading", { name: "Your organizations" })).toBeVisible();
+  // Saved to the account profile.
+  await page.goto("/profile");
+  await expect(page.getByLabel("Name")).toHaveValue("Lena Landing");
 });
 
 test("a session from app.<host> is sent to event subdomains", async ({ page }) => {
   await signInWithOtp(page, `xsub-${Date.now()}@test.dev`);
   const cookies = await page.context().cookies(`http://anything.${ROOT}/`);
   expect(cookies.some((c) => c.name.startsWith("sb-") && c.domain === ".localtest.me")).toBe(true);
+});
+
+test("an invited teammate sets up their profile before joining the organization", async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  const email = `invitee-${id}@test.dev`;
+  const owner = await seedUser(`Owner ${id}`);
+  const { orgId } = await seedEvent({ ownerId: owner, tags: [], name: `Team Event ${id}` });
+  const token = await seedInvite(orgId, email);
+
+  // Invite link → sign in → profile → back to the invite.
+  await page.goto(`/invite/${token}`);
+  await expect(page).toHaveURL((url) => url.pathname === "/login");
+  await page.getByLabel("Email").fill(email);
+  await page.getByRole("button", { name: "Email me a code" }).click();
+  await page.getByLabel(/Code sent to/).fill(await latestOtp(email));
+  await page.getByRole("button", { name: "Verify" }).click();
+  await expect(page).toHaveURL((url) => url.pathname === "/welcome" && url.searchParams.get("next") === `/invite/${token}`);
+  await page.getByLabel("Your name").fill(`Ivo ${id}`);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL((url) => url.pathname === `/invite/${token}`);
+  await page.getByRole("button", { name: "Accept invite" }).click();
+
+  await expect(page).toHaveURL((url) => url.pathname === `/dashboard/orgs/${orgId}`);
+  const team = page.getByRole("region", { name: "Team" });
+  await expect(team.getByText(`Ivo ${id} (you)`)).toBeVisible();
+  await expect(team.getByText(`Owner ${id}`)).toBeVisible();
+  await expect(team.getByText("Unnamed member")).toHaveCount(0);
 });
