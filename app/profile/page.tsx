@@ -48,7 +48,7 @@ export default async function ProfilePage() {
         </p>
         {blockers && blockers.length > 0 ? (
           <div className="flex flex-col gap-1 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning-fg">
-            <p>You&apos;re the only owner of {blockers.length === 1 ? "this organization" : "these organizations"}. Delete {blockers.length === 1 ? "it" : "them"} first:</p>
+            <p>You&apos;re the only owner of {blockers.length === 1 ? "this organization" : "these organizations"}. Transfer ownership to a teammate or delete {blockers.length === 1 ? "it" : "them"} first:</p>
             <ul className="list-disc pl-5">
               {blockers.map((b) => (
                 <li key={b.org_id}><Link href={`/dashboard/orgs/${b.org_id}`} className="underline">{b.name}</Link></li>

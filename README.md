@@ -19,6 +19,8 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
 - **Organizations and team**
   - Create organizations and invite teammates by link as **Admin** or **Staff**. Staff can run events but can't
     archive them or delete events or the organization. Remove members.
+  - **Transfer ownership**: the owner hands the organization to any admin or staff member (with a confirmation).
+    The new owner gets every owner power; the previous owner stays on as an admin.
   - Soft-delete events and organizations. Deleted events can be restored for 30 days from **Recently deleted**.
 - **Event setup**
   - **Details**: name, address (`{slug}.<domain>`, locked once published), time zone, start and end, venue,
@@ -84,9 +86,9 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
 - Find and suspend organizations or people. A suspended person can't sign in and is removed from every event.
 
 ### Not built yet (ideas, roughly in priority order)
-Event agenda / sessions · org ownership transfer · analytics CSV and post-event summary · printable badge QR · "new
-matches" digest push · icebreaker prompts · "here now" presence · Add to Calendar (.ics) · invite emails via Resend
-· billing (Stripe) · custom domains.
+Event agenda / sessions · analytics CSV and post-event summary · printable badge QR · "new matches" digest push ·
+icebreaker prompts · "here now" presence · Add to Calendar (.ics) · invite emails via Resend · billing (Stripe) ·
+custom domains.
 
 ## Stack
 Next.js (App Router, TypeScript, Tailwind) on Vercel · Supabase (Postgres + RLS, Auth, Storage, Realtime, pg_cron, pgmq).
@@ -137,7 +139,7 @@ Web Push. Local worker URL and service key are set by `supabase/seed.sql`; VAPID
 
 - **Account deletion** (Profile → Delete account) calls the `delete-account` Edge Function with the user's token:
   anonymize + delete event data (`delete_account_data()`), delete `avatars/{uid}/…`, delete the auth user. Sole
-  owners of an organization must delete it first. **Data export**: Profile → Download my data (`/profile/export`).
+  owners of an organization must transfer it or delete it first. **Data export**: Profile → Download my data (`/profile/export`).
 - **Retention**: daily cron deletes messages `retention_days` (default 30) after an event ends, except messages
   under an open report. **Auto-archive**: hourly cron archives published events 14 days after they end.
 - **Deleting events / organizations** is a soft delete. Events can be restored from the organization page for 30

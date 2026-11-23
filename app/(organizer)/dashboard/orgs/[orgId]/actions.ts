@@ -47,6 +47,16 @@ export async function removeMember(orgId: string, userId: string): Promise<strin
   return null;
 }
 
+/** Owners only. The new owner must already be on the team; the caller stays on as an admin. */
+export async function transferOwnership(orgId: string, toUserId: string): Promise<string | null> {
+  const { supabase } = await requireUser(`/dashboard/orgs/${orgId}`);
+  const { error } = await supabase.rpc("transfer_org_ownership", { p_org_id: orgId, p_to_user: toUserId });
+  if (error) return friendlyDbError(error);
+  revalidatePath(`/dashboard/orgs/${orgId}`);
+  revalidatePath("/dashboard");
+  return null;
+}
+
 export async function createEvent(orgId: string, _prev: FormState, form: FormData): Promise<FormState> {
   const parsed = parseEventForm(form);
   if (!parsed.success) return fail(parsed.error.issues[0].message);

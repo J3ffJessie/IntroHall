@@ -93,3 +93,8 @@ export async function seedInvite(orgId: string, email: string, role: "admin" | "
                    [orgId, email.toLowerCase(), role, token]);
   return token;
 }
+
+/** Puts an existing user on an organization's team. */
+export async function seedMember(orgId: string, userId: string, role: "owner" | "admin" | "staff" = "staff") {
+  await pool.query("insert into public.org_members (org_id, user_id, role) values ($1, $2, $3)", [orgId, userId, role]);
+}

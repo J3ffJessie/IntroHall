@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CalendarDots, ClockCounterClockwise, Trash, UsersThree } from "@phosphor-icons/react/dist/ssr";
+import { ArrowsLeftRight, CalendarDots, ClockCounterClockwise, Trash, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buttonClass, Card, StatusBadge } from "@/components/ui";
@@ -8,6 +8,7 @@ import { formatEventRange } from "@/lib/time";
 import { InviteForm } from "./invite-form";
 import { RemoveMemberButton, RevokeInviteButton } from "./member-buttons";
 import { DeleteOrgForm, RestoreEventButton } from "./org-danger";
+import { TransferOwnershipForm } from "./transfer-ownership";
 
 export const metadata: Metadata = { title: "Organization" };
 
@@ -102,6 +103,14 @@ export default async function OrgPage({ params }: { params: Promise<{ orgId: str
               </li>
             ))}
           </ul>
+        </Card>
+      )}
+
+      {myRole === "owner" && (
+        <Card title="Transfer ownership" icon={<ArrowsLeftRight weight="duotone" />}>
+          <TransferOwnershipForm orgId={orgId} orgName={org.name} candidates={(members ?? [])
+            .filter((m) => m.role !== "owner" && m.accounts?.full_name)
+            .map((m) => ({ userId: m.user_id, name: m.accounts!.full_name, role: m.role }))} />
         </Card>
       )}
 

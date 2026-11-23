@@ -1433,6 +1433,10 @@ export type Database = {
         Args: { p_conversation_id: string };
         Returns: undefined;
       };
+      transfer_org_ownership: {
+        Args: { p_org_id: string; p_to_user: string };
+        Returns: undefined;
+      };
       unban_attendee: { Args: { p_attendee_id: string }; Returns: undefined };
       unpublish_event: { Args: { p_event_id: string }; Returns: undefined };
       upsert_interests: {
