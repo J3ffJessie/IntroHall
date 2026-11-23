@@ -40,7 +40,7 @@ export default async function MatchesPage({ params, searchParams }:
     }),
     supabase.rpc("get_connections", { p_event_id: event.id }),
     inboxCount(supabase, event.id),
-    supabase.from("announcements").select("id, title, body, pinned, published_at")
+    supabase.from("announcements").select("id, title, body, pinned, published_at, target_tag_id, target:interest_tags(label)")
       .eq("event_id", event.id).not("published_at", "is", null),
   ]);
   const conn = connectionMap(connections ?? []);

@@ -13,6 +13,8 @@ export type Job = {
   kind: string;
   event_id: string;
   user_id: string | null;
+  /** Announcement aimed at an interest: only attendees who picked it. Absent on older jobs. */
+  tag_id?: string | null;
   title: string;
   body: string;
   url: string;
@@ -97,6 +99,8 @@ export async function processQueue(sql: Sql, send: Sender, opts: WorkerOptions =
        where pse.event_id = ${m.event_id}
          and a.left_at is null and a.banned_at is null
          and (${m.user_id}::uuid is null or s.user_id = ${m.user_id}::uuid)
+         and (${m.tag_id ?? null}::uuid is null or exists (
+               select 1 from public.attendee_interests ai where ai.attendee_id = a.id and ai.tag_id = ${m.tag_id ?? null}::uuid))
          and (${m.after_subscription_id}::uuid is null or s.id > ${m.after_subscription_id}::uuid)
        order by s.id
        limit ${perJob + 1}`;

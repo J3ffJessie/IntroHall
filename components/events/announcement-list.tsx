@@ -1,4 +1,9 @@
-export type Announcement = { id: string; title: string; body: string; pinned: boolean; published_at: string | null };
+export type Announcement = {
+  id: string; title: string; body: string; pinned: boolean; published_at: string | null;
+  /** Set on posts aimed at an interest; the label is null if the organizer has since hidden it. */
+  target_tag_id?: string | null;
+  target?: { label: string } | null;
+};
 
 /** Pinned first, then newest. */
 export function sortAnnouncements<T extends Announcement>(list: T[]): T[] {
@@ -12,6 +17,11 @@ export function AnnouncementList({ items, timeZone }: { items: Announcement[]; t
       {items.map((a) => (
         <li key={a.id} className={`rounded-xl border p-4 ${a.pinned ? "border-primary/40 bg-primary-soft/40" : "border-border bg-surface"}`}>
           <p className="font-semibold">{a.pinned && <span aria-label="Pinned">📌 </span>}{a.title}</p>
+          {a.target_tag_id && (
+            <p className="mt-1 text-xs font-medium text-primary">
+              {a.target ? `For people interested in ${a.target.label}` : "For people with one of your interests"}
+            </p>
+          )}
           {a.body && <p className="mt-1 whitespace-pre-line text-sm">{a.body}</p>}
           {a.published_at && <p className="mt-2 text-xs text-muted-foreground">{fmt.format(new Date(a.published_at))}</p>}
         </li>

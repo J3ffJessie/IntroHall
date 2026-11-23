@@ -15,7 +15,7 @@ export default async function AttendeeAnnouncementsPage({ params }: { params: Pr
   const { event, supabase, user, active } = data;
   if (!user || !active) redirect("/join");
   const [{ data: items }, badge] = await Promise.all([
-    supabase.from("announcements").select("id, title, body, pinned, published_at")
+    supabase.from("announcements").select("id, title, body, pinned, published_at, target_tag_id, target:interest_tags(label)")
       .eq("event_id", event.id).not("published_at", "is", null),
     inboxCount(supabase, event.id),
   ]);

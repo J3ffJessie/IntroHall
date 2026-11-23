@@ -39,3 +39,23 @@ describe("parseAnnouncementForm validation", () => {
     expect(parseAnnouncementForm(form({ publish_local: "" }), NY, before).success).toBe(false);
   });
 });
+
+describe("parseAnnouncementForm audience", () => {
+  const tag = "8b0c8e1e-2f7a-4c55-9d6e-0a1b2c3d4e5f";
+  it("defaults to everyone", () => {
+    const r = parseAnnouncementForm(form({ when: "now" }), NY, before);
+    expect(r.success && r.data.target_tag_id).toBeNull();
+  });
+  it("an empty choice means everyone", () => {
+    const r = parseAnnouncementForm(form({ when: "now", target: "" }), NY, before);
+    expect(r.success && r.data.target_tag_id).toBeNull();
+  });
+  it("keeps the chosen interest", () => {
+    const r = parseAnnouncementForm(form({ when: "now", target: tag }), NY, before);
+    expect(r.success && r.data.target_tag_id).toBe(tag);
+  });
+  it("rejects anything that is not an interest id", () => {
+    const r = parseAnnouncementForm(form({ when: "now", target: "rust" }), NY, before);
+    expect(r.success).toBe(false);
+  });
+});

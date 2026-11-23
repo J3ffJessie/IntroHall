@@ -8,7 +8,10 @@ import { Button, Field, FormMessage, inputClass } from "@/components/ui";
 import { useFormAction } from "@/lib/use-form-action";
 import { useConfirm } from "@/components/confirm";
 
-export function AnnouncementComposer({ eventId, timeZone, disabled }: { eventId: string; timeZone: string; disabled: boolean }) {
+export type AudienceTag = { id: string; label: string; attendees: number };
+
+export function AnnouncementComposer({ eventId, timeZone, disabled, tags }:
+  { eventId: string; timeZone: string; disabled: boolean; tags: AudienceTag[] }) {
   const [state, onSubmit, pending] = useFormAction(createAnnouncement.bind(null, eventId, timeZone), { resetOnSuccess: true });
   const [when, setWhen] = useState<"now" | "schedule">("now");
 
@@ -20,6 +23,17 @@ export function AnnouncementComposer({ eventId, timeZone, disabled }: { eventId:
         </Field>
         <Field id="ann-body" label="Message (optional)">
           <textarea id="ann-body" name="body" rows={3} maxLength={2000} className={inputClass} />
+        </Field>
+        <Field id="ann-target" label="Who should see this?"
+               hint="Posts for an interest skip the public event page and only notify attendees who picked it.">
+          <select id="ann-target" name="target" defaultValue="" className={`${inputClass} w-fit`}>
+            <option value="">Everyone at the event</option>
+            {tags.map((t) => (
+              <option key={t.id} value={t.id}>
+                Interested in {t.label} ({t.attendees} {t.attendees === 1 ? "attendee" : "attendees"})
+              </option>
+            ))}
+          </select>
         </Field>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="pinned" /> Pin to the top of the feed

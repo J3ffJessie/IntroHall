@@ -10,6 +10,8 @@ export function parseAnnouncementForm(form: FormData, timeZone: string, now = ne
       pinned: z.boolean(),
       when: z.enum(["now", "schedule"]),
       publish_local: z.string(),
+      // "" = everyone at the event; otherwise the id of an interest tag at this event.
+      target: z.union([z.literal(""), z.string().uuid("Pick an interest from the list")]),
     })
     .transform((v, ctx) => {
       let publish_at: string | null = null;
@@ -25,7 +27,10 @@ export function parseAnnouncementForm(form: FormData, timeZone: string, now = ne
         }
         publish_at = at.toISOString();
       }
-      return { title: v.title, body: v.body, pinned: v.pinned, publish_at, now: v.when === "now" };
+      return {
+        title: v.title, body: v.body, pinned: v.pinned, publish_at, now: v.when === "now",
+        target_tag_id: v.target || null,
+      };
     })
     .safeParse({
       title: form.get("title") ?? "",
@@ -33,5 +38,6 @@ export function parseAnnouncementForm(form: FormData, timeZone: string, now = ne
       pinned: form.get("pinned") === "on",
       when: form.get("when") ?? "now",
       publish_local: form.get("publish_local") ?? "",
+      target: form.get("target") ?? "",
     });
 }

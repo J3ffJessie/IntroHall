@@ -34,7 +34,10 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
     end.
 - **Running the event**
   - **Announcements**: post now or schedule; pin important ones. They appear on the public event page and attendee
-    home, and are pushed to phones with notifications on.
+    home, and are pushed to phones with notifications on. Send one to **everyone** or to **people interested in**
+    one topic (the picker shows how many attendees each reaches): targeted posts skip the public page, show only to
+    attendees with that interest (labelled "For people interested in …"), notify only them, and follow the interest
+    if it's merged.
   - **Attendees**: roster by status (active, setting up, left, banned). **Remove** (can rejoin) or **Ban** (can't),
     and unban.
   - **Reports**: moderation queue with live alerts and a snapshot of the reported message. Resolve with a note,
@@ -81,10 +84,9 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
 - Find and suspend organizations or people. A suspended person can't sign in and is removed from every event.
 
 ### Not built yet (ideas, roughly in priority order)
-Event agenda / sessions · announcements targeted at an interest · org ownership
-transfer · analytics CSV and post-event summary · printable badge QR · "new matches" digest push · icebreaker
-prompts · "here now" presence · Add to Calendar (.ics) · invite emails via Resend · billing (Stripe) · custom
-domains.
+Event agenda / sessions · org ownership transfer · analytics CSV and post-event summary · printable badge QR · "new
+matches" digest push · icebreaker prompts · "here now" presence · Add to Calendar (.ics) · invite emails via Resend
+· billing (Stripe) · custom domains.
 
 ## Stack
 Next.js (App Router, TypeScript, Tailwind) on Vercel · Supabase (Postgres + RLS, Auth, Storage, Realtime, pg_cron, pgmq).

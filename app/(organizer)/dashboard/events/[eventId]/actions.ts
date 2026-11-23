@@ -171,16 +171,17 @@ export async function createAnnouncement(eventId: string, timeZone: string, _pre
   const parsed = parseAnnouncementForm(form, timeZone);
   if (!parsed.success) return fail(parsed.error.issues[0].message);
   const { supabase } = await requireUser(path(eventId, "/announcements"));
-  const { title, body, pinned, publish_at, now } = parsed.data;
+  const { title, body, pinned, publish_at, now, target_tag_id } = parsed.data;
   const { data, error } = await supabase.from("announcements")
-    .insert({ event_id: eventId, title, body, pinned, publish_at }).select("id").single();
+    .insert({ event_id: eventId, title, body, pinned, publish_at, target_tag_id }).select("id").single();
   if (error) return fail(friendlyDbError(error));
   if (now) {
     const { error: pubErr } = await supabase.rpc("publish_announcement", { p_announcement_id: data.id });
     if (pubErr) return fail(friendlyDbError(pubErr));
   }
   await revalidateAnnouncements(eventId);
-  return done(now ? "Posted. Attendees with notifications on will get a push." : "Scheduled.");
+  const who = target_tag_id ? "Attendees with that interest" : "Attendees";
+  return done(now ? `Posted. ${who} with notifications on will get a push.` : "Scheduled.");
 }
 
 export async function publishAnnouncementNow(eventId: string, id: string): Promise<string | null> {

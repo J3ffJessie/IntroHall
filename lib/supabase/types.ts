@@ -57,6 +57,7 @@ export type Database = {
           publish_at: string | null;
           published_at: string | null;
           push_enqueued_at: string | null;
+          target_tag_id: string | null;
           title: string;
           updated_at: string;
         };
@@ -71,6 +72,7 @@ export type Database = {
           publish_at?: string | null;
           published_at?: string | null;
           push_enqueued_at?: string | null;
+          target_tag_id?: string | null;
           title: string;
           updated_at?: string;
         };
@@ -84,6 +86,7 @@ export type Database = {
           publish_at?: string | null;
           published_at?: string | null;
           push_enqueued_at?: string | null;
+          target_tag_id?: string | null;
           title?: string;
           updated_at?: string;
         };
@@ -100,6 +103,13 @@ export type Database = {
             columns: ["event_id"];
             isOneToOne: false;
             referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "announcements_target_tag_id_fkey";
+            columns: ["target_tag_id"];
+            isOneToOne: false;
+            referencedRelation: "interest_tags";
             referencedColumns: ["id"];
           },
         ];
@@ -1237,6 +1247,10 @@ export type Database = {
           purge_after: string;
           slug: string;
         }[];
+      };
+      get_announcement_audiences: {
+        Args: { p_event_id: string };
+        Returns: { attendees: number; label: string; tag_id: string }[];
       };
       get_event_analytics: { Args: { p_event_id: string }; Returns: Json };
       get_event_roster: {

@@ -8,12 +8,16 @@ export const metadata: Metadata = { title: "Announcements" };
 export default async function AnnouncementsAdminPage({ params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
   const { event, supabase } = await getOrgEvent(eventId);
-  const { data } = await supabase.from("announcements")
-    .select("id, title, body, pinned, publish_at, published_at")
-    .eq("event_id", eventId)
-    .order("published_at", { ascending: false, nullsFirst: true })
-    .order("publish_at", { ascending: true });
+  const [{ data }, { data: audiences }] = await Promise.all([
+    supabase.from("announcements")
+      .select("id, title, body, pinned, publish_at, published_at, target:interest_tags(label)")
+      .eq("event_id", eventId)
+      .order("published_at", { ascending: false, nullsFirst: true })
+      .order("publish_at", { ascending: true }),
+    supabase.rpc("get_announcement_audiences", { p_event_id: eventId }),
+  ]);
   const all = data ?? [];
+  const tags = (audiences ?? []).map((t) => ({ id: t.tag_id, label: t.label, attendees: t.attendees }));
   const scheduled = all.filter((a) => !a.published_at);
   const published = all.filter((a) => a.published_at);
   const fmt = new Intl.DateTimeFormat("en-US", {
@@ -25,7 +29,7 @@ export default async function AnnouncementsAdminPage({ params }: { params: Promi
     <main className="flex flex-col gap-6">
       <Card title="New announcement">
         {!live && <p className="rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning-fg">Publish the event to post announcements.</p>}
-        <AnnouncementComposer eventId={eventId} timeZone={event.timezone} disabled={!live} />
+        <AnnouncementComposer eventId={eventId} timeZone={event.timezone} disabled={!live} tags={tags} />
       </Card>
 
       {scheduled.length > 0 && (
@@ -34,6 +38,7 @@ export default async function AnnouncementsAdminPage({ params }: { params: Promi
             {scheduled.map((a) => (
               <li key={a.id} className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
                 <p className="font-medium">{a.title}{a.pinned && <span className="ml-2 text-xs text-muted-foreground">📌 pinned</span>}</p>
+                <AudienceLabel target={a.target} />
                 <p className="text-sm text-muted-foreground">{a.publish_at ? `Posts ${fmt.format(new Date(a.publish_at))}` : "Draft"}</p>
                 <AnnouncementRowActions eventId={eventId} id={a.id} pinned={a.pinned} scheduled />
               </li>
@@ -50,6 +55,7 @@ export default async function AnnouncementsAdminPage({ params }: { params: Promi
             {published.map((a) => (
               <li key={a.id} className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
                 <p className="font-medium">{a.pinned && <span aria-label="Pinned">📌 </span>}{a.title}</p>
+                <AudienceLabel target={a.target} />
                 {a.body && <p className="whitespace-pre-line text-sm">{a.body}</p>}
                 <p className="text-xs text-muted-foreground">{fmt.format(new Date(a.published_at!))}</p>
                 <AnnouncementRowActions eventId={eventId} id={a.id} pinned={a.pinned} />
@@ -59,5 +65,13 @@ export default async function AnnouncementsAdminPage({ params }: { params: Promi
         )}
       </Card>
     </main>
+  );
+}
+
+function AudienceLabel({ target }: { target: { label: string } | null }) {
+  return (
+    <p className="text-xs text-muted-foreground">
+      {target ? <>To attendees interested in <span className="font-medium text-fg">{target.label}</span></> : "To everyone"}
+    </p>
   );
 }

@@ -89,6 +89,18 @@ Deno.test({
         assertEquals(received.map((r) => r.path), ["/ok/1"]);
       });
 
+      await t.step("an announcement aimed at an interest reaches only attendees who picked it", async () => {
+        received.length = 0;
+        const [{ id: tagId }] = await sql`insert into public.interest_tags (event_id, label, is_official)
+                                          values (${eventId}, 'Rust', true) returning id`;
+        await sql`insert into public.attendee_interests (attendee_id, tag_id, event_id)
+                  select a.id, ${tagId}, ${eventId} from public.attendees a
+                   where a.event_id = ${eventId} and a.user_id = any(${[users[0], users[2]]}::uuid[])`;
+        await sql`select pgmq.send(${Q}, ${sql.json(job({ tag_id: tagId }))})`;
+        await processQueue(sql, send, opts);
+        assertEquals(received.map((r) => r.path).sort(), ["/ok/0", "/ok/2"]);
+      });
+
       await t.step("a job that keeps crashing the worker moves to the DLQ after 5 reads", async () => {
         await sql`select pgmq.send(${Q}, ${sql.json(job({ title: "poison" }))})`;
         const crash: Sender = () => { throw new Error("worker crashed"); };
