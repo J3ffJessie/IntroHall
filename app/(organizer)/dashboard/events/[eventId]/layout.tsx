@@ -14,7 +14,7 @@ export default async function EventLayout({ children, params }: { children: Reac
         </Link>
         <h1 className="text-2xl font-semibold">{event.name}</h1>
       </div>
-      <EventNav eventId={eventId} />
+      <div className="print:hidden"><EventNav eventId={eventId} /></div>
       {children}
     </div>
   );

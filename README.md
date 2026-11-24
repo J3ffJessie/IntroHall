@@ -45,7 +45,9 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
   - **Reports**: moderation queue with live alerts and a snapshot of the reported message. Resolve with a note,
     remove or ban.
   - **Analytics**: joined, completed profiles, requests sent and accepted, conversations started, joins over time,
-    top interests and "Open to" totals.
+    top interests and "Open to" totals. **Download CSV** (Section, Item, Value; times in the event's time zone)
+    includes every interest, not just the top 10. Once the event ends, a **Post-event summary** lists the
+    highlights in plain language, with a print button (or save as PDF). Totals only, never per person.
 
 ### Attendees (`{slug}.<domain>`)
 - **Event page**: branded page with dates, venue, description, topics and announcements. It can be installed to
@@ -86,9 +88,8 @@ The design and phased delivery plan lives in `../.omc/plans/conference-network-p
 - Find and suspend organizations or people. A suspended person can't sign in and is removed from every event.
 
 ### Not built yet (ideas, roughly in priority order)
-Event agenda / sessions · analytics CSV and post-event summary · printable badge QR · "new matches" digest push ·
-icebreaker prompts · "here now" presence · Add to Calendar (.ics) · invite emails via Resend · billing (Stripe) ·
-custom domains.
+Printable badge QR · "new matches" digest push · icebreaker prompts · "here now" presence · Add to Calendar (.ics)
+· invite emails via Resend · billing (Stripe) · custom domains.
 
 ## Stack
 Next.js (App Router, TypeScript, Tailwind) on Vercel · Supabase (Postgres + RLS, Auth, Storage, Realtime, pg_cron, pgmq).
